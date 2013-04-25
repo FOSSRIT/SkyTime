@@ -4,15 +4,19 @@ from pygame.locals import *
 hour = 12;
 minute = 0;
 time = '12:00'
+
 goal_time = '4:20'
 
+#--initiate the program / make the surface
 pygame.init()
 windowSurfaceObj = pygame.display.set_mode((1200, 900))
 
+#Load Assets
 background = pygame.image.load('BackgroundClockPage.jpg')
+menuBackground = pygame.image.load('uiBackground.jpg')
 victory = pygame.image.load('sun.gif')
 
-minuteHand = [pygame.image.load('MinHand.png')]
+minuteHand = [pygame.image.load('MinuteHand.png')]
 minuteHand.append(pygame.transform.rotate(minuteHand[0], -30))
 minuteHand.append(pygame.transform.rotate(minuteHand[0], -60))
 minuteHand.append(pygame.transform.rotate(minuteHand[0], -90))
@@ -25,7 +29,7 @@ minuteHand.append(pygame.transform.rotate(minuteHand[0], -270))
 minuteHand.append(pygame.transform.rotate(minuteHand[0], -300))
 minuteHand.append(pygame.transform.rotate(minuteHand[0], -330))
 
-hourHand_12 = pygame.image.load('HourHand (2).png')
+hourHand_12 = pygame.image.load('HourHand.png')
 hourHand_01 = pygame.transform.rotate(hourHand_12, -30)
 hourHand_02 = pygame.transform.rotate(hourHand_12, -60) 
 hourHand_03 = pygame.transform.rotate(hourHand_12, -90)
@@ -38,13 +42,25 @@ hourHand_09 = pygame.transform.rotate(hourHand_12, -270)
 hourHand_10 = pygame.transform.rotate(hourHand_12, -300)
 hourHand_11 = pygame.transform.rotate(hourHand_12, -330)
 
+
 handCover = pygame.image.load('HandCover.png')
+menuButton = pygame.image.load('UiButton.png')
+menuButton2 = pygame.image.load('UiButton.png')
 
 fontObj = pygame.font.Font('freesansbold.ttf', 32)
 
+
+
 while True:
+
+    windowSurfaceObj.blit(background, (0, 0))
+    windowSurfaceObj.blit(fontObj.render(time,False, pygame.Color(0, 0, 0)), (800, 325))
+    #windowSurfaceObj.blit(handCover, (289, 425))
+    #windowSurfaceObj.blit(menuBackground, (0, 0))
+    #windowSurfaceObj.blit(menuButton, (400, 300))
+    #windowSurfaceObj.blit(menuButton2, (400, 400))
     if time == goal_time:
-        windowSurfaceObj.blit(victory, (0, 0))
+        windowSurfaceObj.blit(victory, (0,0))
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -57,11 +73,8 @@ while True:
                 if event.key == K_ESCAPE: # - Quit app
                     pygame.quit()
                     sys.exit()
-    else:
-        # windowSurfaceObj.fill(pygame.Color(255, 255, 255))
-        windowSurfaceObj.blit(background, (0, 0))
+    else: 
 
-        #windowSurfaceObj.blit(minuteHand, (280, 350))
         if minute == 0:
             windowSurfaceObj.blit(minuteHand[0], (280, 350))
         elif minute == 5:
@@ -86,8 +99,8 @@ while True:
             windowSurfaceObj.blit(minuteHand[10], (215, 370))
         elif minute == 55:
             windowSurfaceObj.blit(minuteHand[11], (235, 350))
-        
-        #windowSurfaceObj.blit(hourHand, (290, 375))
+
+
         if hour == 12:
             windowSurfaceObj.blit(hourHand_12, (290, 375))
         elif hour == 1:
@@ -112,19 +125,22 @@ while True:
             windowSurfaceObj.blit(hourHand_10, (225, 390))
         elif hour == 11:
             windowSurfaceObj.blit(hourHand_11, (248, 372))
-        
-        #rotated_hourHand = pygame.transform.rotate(hourHand, 30)# - This is how we rotate images
 
-        #windowSurfaceObj.blit(rotated_hourHand, (290, 375))
-        
+
         windowSurfaceObj.blit(handCover, (289, 425))
-        windowSurfaceObj.blit(fontObj.render(time,True, pygame.Color(0, 0, 0)), (800, 325))
+        windowSurfaceObj.blit(menuBackground, (0, 0))
+        windowSurfaceObj.blit(menuButton, (400, 300))
+        windowSurfaceObj.blit(menuButton2, (400, 400))
 
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             elif event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    menuBackground.set_alpha(0)
+                    menuButton.set_alpha(0)
+                    menuButton2.set_alpha(0)
                 if event.key == K_UP: # - increments hours by 1 
                     hour += 1;
                     if hour > 12:
@@ -146,4 +162,3 @@ while True:
                     sys.exit()
 
     pygame.display.update()
-        
