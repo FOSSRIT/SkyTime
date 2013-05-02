@@ -1,49 +1,52 @@
 import pygame, sys
 from pygame.locals import *
+from random import randint
 
-hour = 12;
+#Generates a random goal time with minutes of increment distance
+def set_time (distance):
+	goal = str(randint(1,12)) + ':'
+	gmin = randint(0, 60) * distance
+	gmin = gmin % 60
+	if gmin < 10:
+		goal += '0'
+	goal += str(gmin)
+	return goal
+
+
+time_keeper = pygame.time.Clock()
+fps = 30
+
+hour = 0;
 minute = 0;
 time = '12:00'
+increment = 5
 
+delay = 5 #How long the victory sun stays up
+waited = 0 #How many frames the victory sun has been up
 goal_time = '4:20'
+challenge = True
 
 #--initiate the program / make the surface
 pygame.init()
 windowSurfaceObj = pygame.display.set_mode((1200, 900))
 
 #Load Assets
-background = pygame.image.load('BackgroundClockPage.jpg')
+freeplay = pygame.image.load('playscreen.gif')
 menuBackground = pygame.image.load('uiBackground.jpg')
 victory = pygame.image.load('sun.gif')
 
-minuteHand = [pygame.image.load('MinuteHand.png')]
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -30))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -60))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -90))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -120))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -150))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -180))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -210))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -240))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -270))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -300))
-minuteHand.append(pygame.transform.rotate(minuteHand[0], -330))
+angles =  [-30, -60, -90, -120, -150, -180, -210, -240, -270, -300, -330]
 
-hourHand_12 = pygame.image.load('HourHand.png')
-hourHand_01 = pygame.transform.rotate(hourHand_12, -30)
-hourHand_02 = pygame.transform.rotate(hourHand_12, -60) 
-hourHand_03 = pygame.transform.rotate(hourHand_12, -90)
-hourHand_04 = pygame.transform.rotate(hourHand_12, -120)
-hourHand_05 = pygame.transform.rotate(hourHand_12, -150)
-hourHand_06 = pygame.transform.rotate(hourHand_12, -180)
-hourHand_07 = pygame.transform.rotate(hourHand_12, -210)
-hourHand_08 = pygame.transform.rotate(hourHand_12, -240)
-hourHand_09 = pygame.transform.rotate(hourHand_12, -270)
-hourHand_10 = pygame.transform.rotate(hourHand_12, -300)
-hourHand_11 = pygame.transform.rotate(hourHand_12, -330)
+minuteHand = [pygame.image.load('MinHand.png')]
+for angle in angles:
+	minuteHand.append(pygame.transform.rotate(minuteHand[0], angle))
+
+hourHand = [pygame.image.load('HourHand (2).png')]
+for angle in angles:
+	hourHand.append(pygame.transform.rotate(hourHand[0], angle))
 
 
-handCover = pygame.image.load('HandCover.png')
+clockCenter = pygame.image.load('clockcenter.png')
 menuButton = pygame.image.load('UiButton.png')
 menuButton2 = pygame.image.load('UiButton.png')
 
@@ -52,113 +55,116 @@ fontObj = pygame.font.Font('freesansbold.ttf', 32)
 
 
 while True:
+	windowSurfaceObj.blit(freeplay, (0, 0))
+	windowSurfaceObj.blit(fontObj.render(time,False, pygame.Color(0, 0, 0)), (800, 325))
+	if challenge:
+		windowSurfaceObj.blit(fontObj.render(goal_time,False, pygame.Color(0, 0, 0)), (800, 525))
+	#windowSurfaceObj.blit(clockCenterd, (289, 425))
+	#windowSurfaceObj.blit(menuBackground, (0, 0))
+	#windowSurfaceObj.blit(menuButton, (400, 300))
+	#windowSurfaceObj.blit(menuButton2, (400, 400))
+	if time == goal_time and challenge:
+		waited += 1
+		windowSurfaceObj.blit(victory, (0,0))
+		if waited % (delay * fps) == 0:
+			minute = 0
+			hour = 0
+			time = '12:00'
+			goal_time = set_time(increment)
+	else: 
+		if minute == 0:
+			windowSurfaceObj.blit(minuteHand[0], (288, 271))
+		elif minute == 5:
+			windowSurfaceObj.blit(minuteHand[1], (290, 290))
+		elif minute == 10:
+			windowSurfaceObj.blit(minuteHand[2], (300, 340))
+		elif minute == 15:
+			windowSurfaceObj.blit(minuteHand[3], (311, 430))
+		elif minute == 20:
+			windowSurfaceObj.blit(minuteHand[4], (295, 435))
+		elif minute == 25:
+			windowSurfaceObj.blit(minuteHand[5], (295, 445))
+		elif minute == 30:
+			windowSurfaceObj.blit(minuteHand[6], (288, 454))
+		elif minute == 35:
+			windowSurfaceObj.blit(minuteHand[7], (200, 445))
+		elif minute == 40:
+			windowSurfaceObj.blit(minuteHand[8], (145, 435))
+		elif minute == 45:
+			windowSurfaceObj.blit(minuteHand[9], (128, 430))
+		elif minute == 50:
+			windowSurfaceObj.blit(minuteHand[10], (145, 340))
+		elif minute == 55:
+			windowSurfaceObj.blit(minuteHand[11], (205, 290))
 
-    windowSurfaceObj.blit(background, (0, 0))
-    windowSurfaceObj.blit(fontObj.render(time,False, pygame.Color(0, 0, 0)), (800, 325))
-    #windowSurfaceObj.blit(handCover, (289, 425))
-    #windowSurfaceObj.blit(menuBackground, (0, 0))
-    #windowSurfaceObj.blit(menuButton, (400, 300))
-    #windowSurfaceObj.blit(menuButton2, (400, 400))
-    if time == goal_time:
-        windowSurfaceObj.blit(victory, (0,0))
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == KEYDOWN:
-                if event.key == K_SPACE:
-                    minute = 0
-                    hour = 12
-                    time = '12:00'
-                if event.key == K_ESCAPE: # - Quit app
-                    pygame.quit()
-                    sys.exit()
-    else: 
-
-        if minute == 0:
-            windowSurfaceObj.blit(minuteHand[0], (280, 350))
-        elif minute == 5:
-            windowSurfaceObj.blit(minuteHand[1], (280, 350))
-        elif minute == 10:
-            windowSurfaceObj.blit(minuteHand[2], (285, 380))
-        elif minute == 15:
-            windowSurfaceObj.blit(minuteHand[3], (295, 420))
-        elif minute == 20:
-            windowSurfaceObj.blit(minuteHand[4], (280, 420))
-        elif minute == 25:
-            windowSurfaceObj.blit(minuteHand[5], (270, 420))
-        elif minute == 30:
-            windowSurfaceObj.blit(minuteHand[6], (273, 450))
-        elif minute == 35:
-            windowSurfaceObj.blit(minuteHand[7], (230, 425))
-        elif minute == 40:
-            windowSurfaceObj.blit(minuteHand[8], (203, 420))
-        elif minute == 45:
-            windowSurfaceObj.blit(minuteHand[9], (208, 415))
-        elif minute == 50:
-            windowSurfaceObj.blit(minuteHand[10], (215, 370))
-        elif minute == 55:
-            windowSurfaceObj.blit(minuteHand[11], (235, 350))
-
-
-        if hour == 12:
-            windowSurfaceObj.blit(hourHand_12, (290, 375))
-        elif hour == 1:
-            windowSurfaceObj.blit(hourHand_01, (280, 375))
-        elif hour == 2:
-            windowSurfaceObj.blit(hourHand_02, (280, 395))
-        elif hour == 3:
-            windowSurfaceObj.blit(hourHand_03, (290, 430))
-        elif hour == 4:
-            windowSurfaceObj.blit(hourHand_04, (280, 425))
-        elif hour == 5:
-            windowSurfaceObj.blit(hourHand_05, (280, 425))
-        elif hour == 6:
-            windowSurfaceObj.blit(hourHand_06, (290, 430))
-        elif hour == 7:
-            windowSurfaceObj.blit(hourHand_07, (248, 425))
-        elif hour == 8:
-            windowSurfaceObj.blit(hourHand_08, (232, 420))
-        elif hour == 9:
-            windowSurfaceObj.blit(hourHand_09, (230, 430))
-        elif hour == 10:
-            windowSurfaceObj.blit(hourHand_10, (225, 390))
-        elif hour == 11:
-            windowSurfaceObj.blit(hourHand_11, (248, 372))
+		if hour == 0:
+			windowSurfaceObj.blit(hourHand[0], (288, 338))
+		elif hour == 1:
+			windowSurfaceObj.blit(hourHand[1], (293, 344))
+		elif hour == 2:
+			windowSurfaceObj.blit(hourHand[2], (308, 376))
+		elif hour == 3:
+			windowSurfaceObj.blit(hourHand[3], (311, 430))
+		elif hour == 4:
+			windowSurfaceObj.blit(hourHand[4], (293, 436))
+		elif hour == 5:
+			windowSurfaceObj.blit(hourHand[5], (293, 444))
+		elif hour == 6:
+			windowSurfaceObj.blit(hourHand[6], (288, 454))
+		elif hour == 7:
+			windowSurfaceObj.blit(hourHand[7], (233, 444))
+		elif hour == 8:
+			windowSurfaceObj.blit(hourHand[8], (200, 434))
+		elif hour == 9:
+			windowSurfaceObj.blit(hourHand[9], (195, 430))
+		elif hour == 10:
+			windowSurfaceObj.blit(hourHand[10], (205, 375))
+		elif hour == 11:
+			windowSurfaceObj.blit(hourHand[11], (235, 344))
 
 
-        windowSurfaceObj.blit(handCover, (289, 425))
-        windowSurfaceObj.blit(menuBackground, (0, 0))
-        windowSurfaceObj.blit(menuButton, (400, 300))
-        windowSurfaceObj.blit(menuButton2, (400, 400))
+		windowSurfaceObj.blit(clockCenter, (281, 424))
+		windowSurfaceObj.blit(menuBackground, (0, 0))
+		windowSurfaceObj.blit(menuButton, (400, 300))
+		windowSurfaceObj.blit(menuButton2, (400, 400))
+		
+	for event in pygame.event.get():
+		if event.type == QUIT:
+			pygame.quit()
+			sys.exit()
+		elif event.type == KEYDOWN:
+			if event.key == K_SPACE:
+				menuBackground.set_alpha(0)
+				menuButton.set_alpha(0)
+				menuButton2.set_alpha(0)
 
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == KEYDOWN:
-                if event.key == K_SPACE:
-                    menuBackground.set_alpha(0)
-                    menuButton.set_alpha(0)
-                    menuButton2.set_alpha(0)
-                if event.key == K_UP: # - increments hours by 1 
-                    hour += 1;
-                    if hour > 12:
-                        hour = 1
-                    time = str(hour) + ':'
-                    if minute < 10:
-                        time += '0'
-                    time += str(minute)
-                if event.key == K_DOWN: # - increments minutes by 5
-                    minute += 5;
-                    if minute == 60:
-                        minute = 0
-                    time = str(hour) + ':'
-                    if minute < 10:
-                        time += '0'
-                    time += str(minute)
-                if event.key == K_ESCAPE: # - Quit app
-                    pygame.quit()
-                    sys.exit()
+			# - increments hours by 1 
+			if event.key == K_UP and time != goal_time:
+				hour += 1;
+				if hour == 12:
+					hour = 0
+					time = '12:'
+				else:
+					time = str(hour) + ':'
+				if minute < 10:
+					time += '0'
+				time += str(minute)
 
-    pygame.display.update()
+			# - increments minutes by increment
+			if event.key == K_DOWN and time != goal_time: 
+				minute += increment;
+				if hour == 0:
+					time = '12:'
+				else:
+					time = str(hour) + ':'
+				if minute == 60:
+					minute = 0
+				if minute < 10:
+					time += '0'
+				time += str(minute)
+			if event.key == K_ESCAPE: # - Quit app
+				pygame.quit()
+				sys.exit()
+
+	pygame.display.update()
+	time_keeper.tick(fps)
