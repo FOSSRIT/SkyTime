@@ -21,48 +21,47 @@ minute = 0;
 time = '12:00'
 increment = 5
 
-delay = 5 #How long the victory sun stays up
+delay = 2 #How long the victory sun stays up
 waited = 0 #How many frames the victory sun has been up
-goal_time = '4:20'
-challenge = True
+goal_time = '12:00'
+challenge = False
 
 #--initiate the program / make the surface
 pygame.init()
 windowSurfaceObj = pygame.display.set_mode((1200, 900))
 
-#Load Assets
-freeplay = pygame.image.load('playscreen.gif')
-menuBackground = pygame.image.load('uiBackground.jpg')
-victory = pygame.image.load('sun.gif')
+#--Load Assests -------- (menus/images/fonts/etc)
+MenuScreen = pygame.image.load('MenuScreen.gif')
+PlayScreen = pygame.image.load('PlayScreen.gif')
+HowToScreen = pygame.image.load('HowToScreen.gif')
+ChallengeScreen = pygame.image.load('ChallengeScreen.gif')
+ClockCenter = pygame.image.load('ClockCenter.png')
+victory = pygame.image.load('Sun.gif')
+fontObj = pygame.font.Font('freesansbold.ttf', 32)
+#^^^^^^^^^^^^^^Load Assets^^^^^^^^^^^^^^^^^^^^
 
-angles =  [-30, -60, -90, -120, -150, -180, -210, -240, -270, -300, -330]
+#--------Hand Rotation-------------------
+angles =  [-30, -60, -90, -120, -150, -180, -210, -240, -270, -300, -330]#angles for clock hands
 
 minuteHand = [pygame.image.load('MinHand.png')]
 for angle in angles:
 	minuteHand.append(pygame.transform.rotate(minuteHand[0], angle))
 
-hourHand = [pygame.image.load('HourHand (2).png')]
+hourHand = [pygame.image.load('HourHand.png')]
 for angle in angles:
 	hourHand.append(pygame.transform.rotate(hourHand[0], angle))
+#^^^^^^^^^^^^^Hand Rotation^^^^^^^^^^^^^^^
 
-
-clockCenter = pygame.image.load('clockcenter.png')
-menuButton = pygame.image.load('UiButton.png')
-menuButton2 = pygame.image.load('UiButton.png')
-
-fontObj = pygame.font.Font('freesansbold.ttf', 32)
 
 
 
 while True:
-	windowSurfaceObj.blit(freeplay, (0, 0))
+	windowSurfaceObj.blit(ChallengeScreen, (0, 0))
+	windowSurfaceObj.blit(PlayScreen, (0, 0))
 	windowSurfaceObj.blit(fontObj.render(time,False, pygame.Color(0, 0, 0)), (800, 325))
 	if challenge:
 		windowSurfaceObj.blit(fontObj.render(goal_time,False, pygame.Color(0, 0, 0)), (800, 525))
-	#windowSurfaceObj.blit(clockCenterd, (289, 425))
-	#windowSurfaceObj.blit(menuBackground, (0, 0))
-	#windowSurfaceObj.blit(menuButton, (400, 300))
-	#windowSurfaceObj.blit(menuButton2, (400, 400))
+
 	if time == goal_time and challenge:
 		waited += 1
 		windowSurfaceObj.blit(victory, (0,0))
@@ -123,23 +122,43 @@ while True:
 			windowSurfaceObj.blit(hourHand[11], (235, 344))
 
 
-		windowSurfaceObj.blit(clockCenter, (281, 424))
-		windowSurfaceObj.blit(menuBackground, (0, 0))
-		windowSurfaceObj.blit(menuButton, (400, 300))
-		windowSurfaceObj.blit(menuButton2, (400, 400))
+		windowSurfaceObj.blit(ClockCenter, (281, 424))
+		windowSurfaceObj.blit(HowToScreen, (0, 0))
+		windowSurfaceObj.blit(MenuScreen, (0, 0))
+		
 		
 	for event in pygame.event.get():
 		if event.type == QUIT:
 			pygame.quit()
 			sys.exit()
 		elif event.type == KEYDOWN:
-			if event.key == K_SPACE:
-				menuBackground.set_alpha(0)
-				menuButton.set_alpha(0)
-				menuButton2.set_alpha(0)
+			if event.key == K_1:#Go to PlayScreen (make all other screens invisible)
+				MenuScreen.set_alpha(0)
+				ChallengeScreen.set_alpha(0)
+				HowToScreen.set_alpha(0)
+				PlayScreen.set_alpha(300)
+				challenge = False
+			if event.key == K_2:#Go to ChallengeScreen (make all other screens invisible)
+				MenuScreen.set_alpha(0)
+				PlayScreen.set_alpha(0)
+				HowToScreen.set_alpha(0)
+				ChallengeScreen.set_alpha(300)
+				challenge = True
+			if event.key == K_3:#Go to How To Play (make all other screens invisible)
+				MenuScreen.set_alpha(0)
+				ChallengeScreen.set_alpha(0)
+				PlayScreen.set_alpha(0)
+				HowToScreen.set_alpha(300)
+				challenge = False
+			if event.key == K_BACKSPACE:#Go Back To Menu (make all other screens invisible)
+				PlayScreen.set_alpha(0)
+				ChallengeScreen.set_alpha(0)
+				HowToScreen.set_alpha(0)
+				MenuScreen.set_alpha(300)
+				challenge = False
 
 			# - increments hours by 1 
-			if event.key == K_UP and time != goal_time:
+			if event.key == K_LSHIFT and (time != goal_time or not challenge):
 				hour += 1;
 				if hour == 12:
 					hour = 0
@@ -151,7 +170,7 @@ while True:
 				time += str(minute)
 
 			# - increments minutes by increment
-			if event.key == K_DOWN and time != goal_time: 
+			if event.key == K_RSHIFT and (time != goal_time or not challenge): 
 				minute += increment;
 				if hour == 0:
 					time = '12:'
