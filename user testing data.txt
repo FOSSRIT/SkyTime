@@ -1,0 +1,34 @@
+Imagine RIT Playtesting
+
+Grade k=8
+Grade 1=7
+Grade 2=5
+Grade 3=6
+Grade 4=11
+Grade 5+=16
+*There were more kids who we did not record, in all we tested at least 50 if not a few more
+
+Common issues:
+-Students will go directly for mouse (even if it is hidden from sight)
+-Using shift key takes a while for kid to figure out. Very hesitant to push at first even when prompted. Once sees it works then pick up on the controls very quickly
+	-Often go for arrow keys first
+
+Suggestions:
+-loose condition
+-do not show current time
+-Military time
+-Customize clocks
+-mouse
+-5th Grade use fractions/ word problems
+	-roman numerals
+-Score
+	-Keep score out of 10
+-Play against computer
+-Timed (45 seconds)
+-Visual feedback
+	-confetti
+	-receive medal
+-hours green minutes red
+-As get closer to correct time hand changes 
+
+**unintended competition arose when two kids who knew each other played at the same time
