@@ -1,0 +1,8 @@
+[Activity]
+name = SkyTime
+bundle_id = org.laptop.SkyTimeActivity
+class = SkytimeActivity.SkyTimeActivity
+icon = activity-SkyTime
+activity_version = 1
+host_version = 1
+show_launcher = yes
