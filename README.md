@@ -1,24 +1,21 @@
-Sky-Time
+SkyTime
 ========
 
 Educational game for Sugar
 
-This game is designed to teach youth the connection between clocks and time.  
+This game is designed to teach younger children the connection between clocks and time as well as how to read an analog clock.  
 
-We plan to have a title screen with two buttons, a 'play' button where the student can become familiar with the program, 
-and a 'challenge' button that will allow the youth to test their knowledge of telling time.
+The game currently has three different language settings: English, Spanish, and French.
 
-To be able to run the game, you need to generate and move the .mo files into the correctdirectories.
+There are three different menu settings: Play, Challenge, and Tutorial.
 
-To do this, open a terminal and go into the po/ directory and enter the following commands:
+Play: This game mode has the player interact with the clock hands to match their displayed time with the goal time displayed.
+If the play does this correctly, a sun is displayed and the player is awarded one sun.  We plan on implementing a reward system
+to give meaning to the suns you are awarded.  These suns will turn into a currency where players can purchase new themes for the game
+and customize almost everything!
 
-    $ python msgfmt.py SkyTimeEnglish.po
-    $ sudo mv ./SkyTimeEnglish.mo /usr/share/locale/en/LC_MESSAGES/
+Challenge: This game mode is has the same exact concept of the 'Play' game mode, execpt here your time is not displayed, only the
+goal time.  This creates more of a challenge for children to tell time only by reading the clock rather than comparing their displayed
+time and the goal time and adjusting the hands until the two are identical.
 
-This will generate the .mo file for the English translations and move the file to the proper directory that the game will read from.  Repeat those two steps for each language.
-
-You will need to replace the 'en' in the second command line with the corresponding language code.
-
-English = en
-Spanish = es
-French = fr
+Tutorial: This screen just shows the layout of the XO laptop keyboard and what buttons the player will need to use to play the game.
