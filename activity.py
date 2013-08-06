@@ -2,13 +2,16 @@
 
 from sugar.activity import activity
 
-from pygame.locals import K_1, K_2, K_3, K_ESCAPE, K_RETURN, \
-    K_LSHIFT, K_RSHIFT, K_BACKSPACE, QUIT, KEYDOWN
 import pygame
 import gettext
 from random import randint
 from pygame import transform
 from badges import badges
+from pygame.locals import K_1, K_2, K_3, K_ESCAPE, K_RETURN, \
+    K_LSHIFT, K_RSHIFT, K_BACKSPACE, QUIT, KEYDOWN
+from constants import width, height, clock_render_left, clock_render_top, \
+    box_render_left, time_render_left, your_time_render_top, HANDS, \
+    goal_time_render_top
 
 
 class SkyTimeActivity(activity.Activity):
@@ -21,21 +24,24 @@ class SkyTimeActivity(activity.Activity):
     challenge = False
     winner = False
     gameloop = True
+    update_screen = True
+    update_hands = False
     windowSurfaceObj = None
     fontObj = None
-    PlayScreen = None
-    ChallengeScreen = None
-    ClockCenter = None
-    minuteHand = []
-    hourHand = []
     increment = 5
     waited = 0
-    width = 1200
-    height = 900
     mode = 'language'
     playing = False
-    score = ''
     score_count = 0
+    incorrect_count = 0
+
+    hour_style = 'default'
+    minute_style = 'default'
+    center_style = 'default'
+    background_style = 'default'
+    clock_style = 'default'
+    box_style = 'default'
+    time_box_style = 'white'
 
     # Generates a random goal time with minutes of increment distance
     def set_time(self, distance):
@@ -57,283 +63,282 @@ class SkyTimeActivity(activity.Activity):
 
     def drawScreen(self, mode):
 
-        #Draw the normal play screen
-        if self.playing:
-            if self.mode == 'challenge':
-                screen = transform.scale(
-                    self.PlayScreen, (self.width, self.height))
+        if self.update_screen:
+
+            #Draw the normal play screen
+            if self.playing:
+
+                # Set the background
+                background = pygame.image.load(
+                    'images/background/{}.png'.format(self.background_style))
+                screen = transform.scale(background, (width, height))
                 self.windowSurfaceObj.blit(screen, (0, 0))
+
+                # Display the instructional box
+                instructions = pygame.image.load(
+                    'images/instruction/box-{}.png'.format(self.box_style))
+                self.windowSurfaceObj.blit(instructions, (0, height * .685))
+
+                # Load time box image
+                time_box = pygame.image.load(
+                    'images/box/{}.png'.format(self.time_box_style))
+
+                # If in challenge mode, only display the goal time
+                if mode == 'challenge':
+                    # Displays your goal time
+                    self.windowSurfaceObj.blit(
+                        time_box,
+                        (box_render_left,
+                         goal_time_render_top + (height * .025)))
+                    self.windowSurfaceObj.blit(self.fontObj.render(
+                        self.goal_time, False, pygame.Color(0, 0, 0)),
+                        (time_render_left,
+                         goal_time_render_top + (height * .09)))
+                    self.windowSurfaceObj.blit(self.fontObj.render(
+                        self._('Goal Time'), False, pygame.Color(0, 0, 0)),
+                        (box_render_left, goal_time_render_top))
+
+                # Otherwise, display your current time and goal time
+                else:
+
+                    # Displays your current time
+                    self.windowSurfaceObj.blit(self.fontObj.render(
+                        self._('Your Time'), False, pygame.Color(0, 0, 0)),
+                        (box_render_left, your_time_render_top))
+
+                    # Displays your goal time
+                    self.windowSurfaceObj.blit(
+                        time_box,
+                        (box_render_left,
+                         goal_time_render_top + (height * .025)))
+                    self.windowSurfaceObj.blit(self.fontObj.render(
+                        self.goal_time, False, pygame.Color(0, 0, 0)),
+                        (time_render_left,
+                         goal_time_render_top + (height * .09)))
+                    self.windowSurfaceObj.blit(self.fontObj.render(
+                        self._('Goal Time'), False, pygame.Color(0, 0, 0)),
+                        (box_render_left, goal_time_render_top))
+
+                # Displays the players score
                 self.windowSurfaceObj.blit(self.fontObj.render(
-                    self.goal_time, False, pygame.Color(0, 0, 0)),
-                    (self.width * .71, self.height * .34))
-                self.windowSurfaceObj.blit(self.fontObj.render(
-                    self._('Goal Time'), False, pygame.Color(0, 0, 0)),
-                    (self.width * .55, self.height * .25))
+                    str(self.score_count), False, pygame.Color(0, 0, 0)),
+                    (width * .69, height * .56))
 
-            else:
-                screen = transform.scale(
-                    self.ChallengeScreen, (self.width, self.height))
-                self.windowSurfaceObj.blit(screen, (0, 0))
-                self.windowSurfaceObj.blit(self.fontObj.render(
-                    self.time, False, pygame.Color(0, 0, 0)),
-                    (self.width * .71, self.height * .34))
-                self.windowSurfaceObj.blit(self.fontObj.render(
-                    self._('Your Time'), False, pygame.Color(0, 0, 0)),
-                    (self.width * .55, self.height * .25))
-                self.windowSurfaceObj.blit(self.fontObj.render(
-                    self.goal_time, False, pygame.Color(0, 0, 0)),
-                    (self.width * .71, self.height * .525))
-                self.windowSurfaceObj.blit(self.fontObj.render(
-                    self._('Goal Time').decode('utf8'),
-                    False, pygame.Color(0, 0, 0)),
-                    (self.width * .55, self.height * .435))
-
-            # Draw the player's score
-            self.windowSurfaceObj.blit(self.fontObj.render(
-                self.score, False, pygame.Color(0, 0, 0)),
-                (self.width * .69, self.height * .70))
-
-            # Draw help text
-            text = self.challengeText.render(
-                self._('When you think the clock is correct, press'),
-                False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            self.windowSurfaceObj.blit(
-                text, (self.width * .44 - (fw / 2), self.height * .11))
-
-            # Draw minute and hour hand help text at bottom of screen
-            render_top = self.height * .92
-            text = self.infoText.render(
-                self._('Hour Hand'), False, pygame.Color(0, 255, 0))
-            text2 = self.infoText.render(
-                self._('= press'), False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            fw2, fh2 = text.get_size()
-            self.windowSurfaceObj.blit(
-                text, (self.width * .30 - ((fw + fw2) / 2), render_top))
-            self.windowSurfaceObj.blit(
-                text2, (self.width * .31 + (fw / 2) - (fw2 / 2), render_top))
-            text = self.infoText.render(
-                self._('Minute Hand'), False, pygame.Color(255, 0, 0))
-            text2 = self.infoText.render(
-                self._('= press'), False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            fw2, fh2 = text2.get_size()
-            self.windowSurfaceObj.blit(
-                text, (self.width * .75 - ((fw + fw2) / 2), render_top))
-            self.windowSurfaceObj.blit(
-                text2, (self.width * .76 + (fw / 2) - (fw2 / 2), render_top))
-
-            # Draw shift button text
-            text = self.shiftButton.render(
-                self._('shift'), False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            render_top = self.height * .93
-            self.windowSurfaceObj.blit(
-                text, (self.width * .445 - (fw / 2), render_top))
-            self.windowSurfaceObj.blit(
-                text, (self.width * .9375 - (fw / 2), render_top))
-
-            # Draw enter button text
-            text = self.enterButton.render(
-                self._('enter'), False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            self.windowSurfaceObj.blit(
-                text, (self.width * .875 - (fw / 2), self.height * .145))
-
-            # Draw the clock hands
-            self.drawHands()
-
-        # Draw the vicotry screen
-        elif mode == 'victory':
-            self.windowSurfaceObj.blit(self.victory, (0, 0))
-
-        # Draw the menu screen
-        elif mode == 'menu':
-            render_left = self.width * .27
-            interval = .18
-            spacer = .33
-
-            screen = transform.scale(
-                self.MenuScreen, (self.width, self.height))
-            self.windowSurfaceObj.blit(screen, (0, 0))
-            for i in range(0, 3):
-                text = self.menuText.render(
-                    self._('Press'), False, pygame.Color(0, 0, 0))
+                # Displays help text
+                text = self.challengeText.render(
+                    self._('When you think the clock is correct, press'),
+                    False, pygame.Color(255, 255, 255))
                 fw, fh = text.get_size()
                 self.windowSurfaceObj.blit(
-                    text, (render_left - (fw / 2), self.height * spacer))
-                spacer += interval
+                    text, (width * .44 - (fw / 2), height * .76))
 
-            render_left = self.width * .48
-            spacer = .33
-            self.windowSurfaceObj.blit(self.menuText.render(
-                self._('Play'), False, pygame.Color(0, 0, 0)),
-                (render_left, self.height * spacer))
-            self.windowSurfaceObj.blit(self.menuText.render(
-                self._('Challenge').decode('utf8'),
-                False, pygame.Color(0, 0, 0)),
-                (render_left, self.height * (spacer + interval)))
-            self.windowSurfaceObj.blit(self.menuText.render(
-                self._('How To Play').decode('utf8'),
-                False, pygame.Color(0, 0, 0)),
-                (render_left, self.height * (spacer + (interval * 2))))
+                # Display help text at the bottom of the screen
+                render_top = height * .895
+                text = self.infoText.render(
+                    self._('Hour Hand'), False, pygame.Color(0, 255, 0))
+                text2 = self.infoText.render(
+                    self._('= press'), False, pygame.Color(255, 255, 255))
+                fw, fh = text.get_size()
+                fw2, fh2 = text.get_size()
+                self.windowSurfaceObj.blit(
+                    text, (width * .30 - ((fw + fw2) / 2), render_top))
+                self.windowSurfaceObj.blit(
+                    text2, (width * .31 + (fw / 2) - (fw2 / 2), render_top))
+                text = self.infoText.render(self._('Minute Hand'), False,
+                                            pygame.Color(255, 0, 0))
+                text2 = self.infoText.render(
+                    self._('= press'), False, pygame.Color(255, 255, 255))
+                fw, fh = text.get_size()
+                fw2, fh2 = text2.get_size()
+                self.windowSurfaceObj.blit(
+                    text, (width * .75 - ((fw + fw2) / 2), render_top))
+                self.windowSurfaceObj.blit(
+                    text2, (width * .76 + (fw / 2) - (fw2 / 2), render_top))
 
-        # Draw the language selection screen
-        elif mode == 'language':
-            screen = transform.scale(
-                self.Languages, (self.width, self.height))
-            self.windowSurfaceObj.blit(screen, (0, 0))
+                # Display the enter button text
+                text = self.enterButton.render(
+                    self._('enter'), False, pygame.Color(0, 0, 0))
+                fw, fh = text.get_size()
+                self.windowSurfaceObj.blit(
+                    text, (width * .885 - (fw / 2), height * .79))
 
-        # Draw the how to play screen
-        else:
-            screen = transform.scale(
-                self.HowToScreen, (self.width, self.height))
-            self.windowSurfaceObj.blit(screen, (0, 0))
+                # Display the shift button text
+                text = self.shiftButton.render(
+                    self._('shift'), False, pygame.Color(0, 0, 0))
+                fw, fh = text.get_size()
+                render_top = height * .9
+                self.windowSurfaceObj.blit(
+                    text, (width * .445 - (fw / 2), render_top))
+                self.windowSurfaceObj.blit(
+                    text, (width * .9375 - (fw / 2), render_top))
 
-            text = self.howToPlay.render(
-                self._('How To Play').decode('utf8'),
-                False, pygame.Color(255, 255, 0))
-            fw, fh = text.get_size()
-            self.windowSurfaceObj.blit(
-                text, ((self.width * .52) - (fw / 2), self.height * .05))
+            # Draw the vicotry screen
+            elif mode == 'victory':
+                self.windowSurfaceObj.blit(self.victory, (0, 0))
 
-            text = self.fontObj.render(
-                self._('When you think it is correct, press'),
-                False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            self.windowSurfaceObj.blit(
-                text, (self.width * .42 - (fw / 2), self.height * .89))
+            # Draw the menu screen
+            elif mode == 'menu':
+                render_left = width * .27
+                interval = .18
+                spacer = .33
 
-            text = self.helpText.render(
-                self._('Press this key'), False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            render_left = self.width * .22 - (fw / 2)
-            render_top = self.height * .63
-            self.windowSurfaceObj.blit(text, (render_left, render_top))
+                screen = transform.scale(
+                    self.MenuScreen, (width, height))
+                self.windowSurfaceObj.blit(screen, (0, 0))
+                for i in range(0, 3):
+                    text = self.menuText.render(
+                        self._('Press'), False, pygame.Color(0, 0, 0))
+                    fw, fh = text.get_size()
+                    self.windowSurfaceObj.blit(
+                        text, (render_left - (fw / 2), height * spacer))
+                    spacer += interval
 
-            self.windowSurfaceObj.blit(self.helpText.render(
-                self._('to move the').decode('utf8'), False,
-                pygame.Color(0, 0, 0)),
-                (render_left, render_top + fh))
-            self.windowSurfaceObj.blit(self.helpText.render(
-                self._('hour hand'), False,
-                pygame.Color(0, 0, 0)),
-                (render_left, render_top + (fh * 2)))
+                render_left = width * .48
+                spacer = .33
+                self.windowSurfaceObj.blit(self.menuText.render(
+                    self._('Play'), False, pygame.Color(0, 0, 0)),
+                    (render_left, height * spacer))
+                self.windowSurfaceObj.blit(self.menuText.render(
+                    self._('Challenge').decode('utf8'),
+                    False, pygame.Color(0, 0, 0)),
+                    (render_left, height * (spacer + interval)))
+                self.windowSurfaceObj.blit(self.menuText.render(
+                    self._('How To Play').decode('utf8'),
+                    False, pygame.Color(0, 0, 0)),
+                    (render_left, height * (spacer + (interval * 2))))
 
-            text = self.helpText.render(
-                self._('Press this key'), False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            render_left = self.width * .78 - (fw / 2)
-            self.windowSurfaceObj.blit(text, (render_left, render_top))
+            # Draw the language selection screen
+            elif self.mode == 'language':
+                screen = transform.scale(
+                    self.Languages, (width, height))
+                self.windowSurfaceObj.blit(screen, (0, 0))
 
-            self.windowSurfaceObj.blit(self.helpText.render(
-                self._('to move the').decode('utf8'), False,
-                pygame.Color(0, 0, 0)),
-                (render_left, render_top + fh))
-            self.windowSurfaceObj.blit(self.helpText.render(
-                self._('minute hand'), False,
-                pygame.Color(0, 0, 0)),
-                (render_left, render_top + (fh * 2)))
+            # Draw the how to play screen
+            else:
+                screen = transform.scale(
+                    self.HowToScreen, (width, height))
+                self.windowSurfaceObj.blit(screen, (0, 0))
 
-            text = self.enterButton.render(
-                self._('enter'), False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            self.windowSurfaceObj.blit(
-                text, (self.width * .78 - (fw / 2), self.height * .915))
+                text = self.howToPlay.render(
+                    self._('How To Play').decode('utf8'),
+                    False, pygame.Color(255, 255, 0))
+                fw, fh = text.get_size()
+                self.windowSurfaceObj.blit(
+                    text, ((width * .52) - (fw / 2), height * .05))
 
-            text = self.shiftButton.render(
-                self._('shift'), False, pygame.Color(0, 0, 0))
-            fw, fh = text.get_size()
-            render_top = self.height * .43
+                text = self.fontObj.render(
+                    self._('When you think it is correct, press'),
+                    False, pygame.Color(0, 0, 0))
+                fw, fh = text.get_size()
+                self.windowSurfaceObj.blit(
+                    text, (width * .42 - (fw / 2), height * .89))
 
-            self.windowSurfaceObj.blit(
-                text, (self.width * .205 - (fw / 2), render_top))
-            self.windowSurfaceObj.blit(
-                text, (self.width * .755 - (fw / 2), render_top))
+                text = self.helpText.render(
+                    self._('Press this key'), False, pygame.Color(0, 0, 0))
+                fw, fh = text.get_size()
+                render_left = width * .22 - (fw / 2)
+                render_top = height * .63
+                self.windowSurfaceObj.blit(text, (render_left, render_top))
 
-    def drawHands(self):
+                self.windowSurfaceObj.blit(self.helpText.render(
+                    self._('to move the').decode('utf8'), False,
+                    pygame.Color(0, 0, 0)),
+                    (render_left, render_top + fh))
+                self.windowSurfaceObj.blit(self.helpText.render(
+                    self._('hour hand'), False,
+                    pygame.Color(0, 0, 0)),
+                    (render_left, render_top + (fh * 2)))
 
-        # Checks the current time and draws the hands accordingly
-        if self.minute == 0:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[0], (self.width * .245, self.height * .33))
-        elif self.minute == 5:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[1], (self.width * .245, self.height * .34))
-        elif self.minute == 10:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[2], (self.width * .245, self.height * .41))
-        elif self.minute == 15:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[3], (self.width * .265, self.height * .505))
-        elif self.minute == 20:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[4], (self.width * .26, self.height * .505))
-        elif self.minute == 25:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[5], (self.width * .245, self.height * .505))
-        elif self.minute == 30:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[6], (self.width * .245, self.height * .515))
-        elif self.minute == 35:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[7], (self.width * .175, self.height * .5))
-        elif self.minute == 40:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[8], (self.width * .12, self.height * .5))
-        elif self.minute == 45:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[9], (self.width * .105, self.height * .51))
-        elif self.minute == 50:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[10], (self.width * .135, self.height * .405))
-        elif self.minute == 55:
-            self.windowSurfaceObj.blit(
-                self.minuteHand[11], (self.width * .175, self.height * .35))
+                text = self.helpText.render(
+                    self._('Press this key'), False, pygame.Color(0, 0, 0))
+                fw, fh = text.get_size()
+                render_left = width * .78 - (fw / 2)
+                self.windowSurfaceObj.blit(text, (render_left, render_top))
 
-        if self.hour == 0:
-            self.windowSurfaceObj.blit(
-                self.hourHand[0], (self.width * .245, self.height * .39))
-        elif self.hour == 1:
-            self.windowSurfaceObj.blit(
-                self.hourHand[1], (self.width * .25, self.height * .395))
-        elif self.hour == 2:
-            self.windowSurfaceObj.blit(
-                self.hourHand[2], (self.width * .26, self.height * .435))
-        elif self.hour == 3:
-            self.windowSurfaceObj.blit(
-                self.hourHand[3], (self.width * .27, self.height * .505))
-        elif self.hour == 4:
-            self.windowSurfaceObj.blit(
-                self.hourHand[4], (self.width * .265, self.height * .515))
-        elif self.hour == 5:
-            self.windowSurfaceObj.blit(
-                self.hourHand[5], (self.width * .255, self.height * .525))
-        elif self.hour == 6:
-            self.windowSurfaceObj.blit(
-                self.hourHand[6], (self.width * .245, self.height * .53))
-        elif self.hour == 7:
-            self.windowSurfaceObj.blit(
-                self.hourHand[7], (self.width * .195, self.height * .515))
-        elif self.hour == 8:
-            self.windowSurfaceObj.blit(
-                self.hourHand[8], (self.width * .165, self.height * .5))
-        elif self.hour == 9:
-            self.windowSurfaceObj.blit(
-                self.hourHand[9], (self.width * .165, self.height * .505))
-        elif self.hour == 10:
-            self.windowSurfaceObj.blit(
-                self.hourHand[10], (self.width * .17, self.height * .435))
-        elif self.hour == 11:
-            self.windowSurfaceObj.blit(
-                self.hourHand[11], (self.width * .2, self.height * .4))
+                self.windowSurfaceObj.blit(self.helpText.render(
+                    self._('to move the').decode('utf8'), False,
+                    pygame.Color(0, 0, 0)),
+                    (render_left, render_top + fh))
+                self.windowSurfaceObj.blit(self.helpText.render(
+                    self._('minute hand'), False,
+                    pygame.Color(0, 0, 0)),
+                    (render_left, render_top + (fh * 2)))
 
-        screen = transform.scale(self.ClockCenter,
-                                (self.width / 22, self.height / 18))
-        self.windowSurfaceObj.blit(screen,
-                                  (self.width * .24, self.height * .5))
-        return(0)
+                text = self.enterButton.render(
+                    self._('enter'), False, pygame.Color(0, 0, 0))
+                fw, fh = text.get_size()
+                self.windowSurfaceObj.blit(
+                    text, (width * .78 - (fw / 2), height * .915))
+
+                text = self.shiftButton.render(
+                    self._('shift'), False, pygame.Color(0, 0, 0))
+                fw, fh = text.get_size()
+                render_top = height * .43
+
+                self.windowSurfaceObj.blit(
+                    text, (width * .205 - (fw / 2), render_top))
+                self.windowSurfaceObj.blit(
+                    text, (width * .755 - (fw / 2), render_top))
+
+        if self.update_hands:
+
+                # Draw the clock
+                clock = pygame.image.load(
+                    'images/clock/clock-{}.png'.format(self.clock_style))
+                self.windowSurfaceObj.blit(
+                    clock, (clock_render_left, clock_render_top))
+
+                # Draw the minute hand on the clock
+                self.windowSurfaceObj.blit(
+                    HANDS['minute'][self.minute]['image'],
+                    (HANDS['minute'][self.minute]['render_left'],
+                     HANDS['minute'][self.minute]['render_top']))
+
+                # Draw the hour hand on the clock
+                self.windowSurfaceObj.blit(
+                    HANDS['hour'][self.hour]['image'],
+                    (HANDS['hour'][self.hour]['render_left'],
+                     HANDS['hour'][self.hour]['render_top']))
+
+                # Draw the clock center
+                screen = transform.scale(
+                    self.ClockCenter, (width/22, height/18))
+                self.windowSurfaceObj.blit(
+                    screen,
+                    (clock_render_left + (width * .2275),
+                     clock_render_top + (height * .31)))
+
+                if self.mode == 'play':
+
+                    # Load time box image
+                    time_box = pygame.image.load(
+                        'images/box/{}.png'.format(self.time_box_style))
+
+                    # Displays your time
+                    self.windowSurfaceObj.blit(
+                        time_box,
+                        (box_render_left,
+                         your_time_render_top + (height * .025)))
+                    self.windowSurfaceObj.blit(self.fontObj.render(
+                        self.time, False, pygame.Color(0, 0, 0)),
+                        (time_render_left,
+                         your_time_render_top + (height * .09)))
+
+    def loadHands(self):
+        angles = [0, -30, -60, -90, -120, -150, -180,
+                  -210, -240, -270, -300, -330]
+
+        minute_image = pygame.image.load(
+            'images/hand/minute-{}.png'.format(self.minute_style))
+
+        hour_image = pygame.image.load(
+            'images/hand/hour-{}.png'.format(self.hour_style))
+
+        for i in range(0, len(angles)):
+            minute_hand = pygame.transform.rotate(minute_image, angles[i])
+            hour_hand = pygame.transform.rotate(hour_image, angles[i])
+            HANDS['minute'][i*self.increment]['image'] = minute_hand
+            HANDS['hour'][i]['image'] = hour_hand
 
     def __init__(self, handle):
 
@@ -363,14 +368,13 @@ class SkyTimeActivity(activity.Activity):
         # Initializes pygame and the screen Surface object
         pygame.init()
         self.windowSurfaceObj = pygame.display.set_mode(
-            (self.width, self.height))
+            (width, height))
 
         # Loads all of the assets
         self.MenuScreen = pygame.image.load('images/MenuScreen.gif')
-        self.PlayScreen = pygame.image.load('images/PlayScreen.gif')
         self.HowToScreen = pygame.image.load('images/HowToScreen.gif')
-        self.ChallengeScreen = pygame.image.load('images/ChallengeScreen.gif')
-        self.ClockCenter = pygame.image.load('images/ClockCenter.png')
+        self.ClockCenter = pygame.image.load(
+            'images/clock/center-{}.png'.format(self.center_style))
         self.Languages = pygame.image.load('images/language.gif')
         self.victory = pygame.image.load('images/Sun.gif')
         self.fontObj = pygame.font.Font('freesansbold.ttf', 32)
@@ -382,22 +386,6 @@ class SkyTimeActivity(activity.Activity):
         self.infoText = pygame.font.Font('freesansbold.ttf', 28)
         self.menuText = pygame.font.Font('freesansbold.ttf', 52)
 
-        # The angles for the clock hands
-        angles = [-30, -60, -90, -120, -150, -180,
-                  -210, -240, -270, -300, -330]
-
-        # Loads in the minute hand and creates an array with all of the angles
-        self.minuteHand = [pygame.image.load('images/MinHand.png')]
-        for angle in angles:
-            self.minuteHand.append(
-                pygame.transform.rotate(self.minuteHand[0], angle))
-
-        # Loads in the hour hand and creates an array with all the angles
-        self.hourHand = [pygame.image.load('images/HourHand.png')]
-        for angle in angles:
-            self.hourHand.append(
-                pygame.transform.rotate(self.hourHand[0], angle))
-
         # Draws the menu screen to start with
         self.windowSurfaceObj.blit(self.MenuScreen, (0, 0))
 
@@ -405,7 +393,8 @@ class SkyTimeActivity(activity.Activity):
         while self.gameloop:
 
             self.drawScreen(self.mode)
-            self.score = str(self.score_count)
+            self.update_screen = False
+            self.update_hands = False
 
             # Checks if the player won the challenge
             if self.time == self.goal_time and self.winner:
@@ -427,6 +416,9 @@ class SkyTimeActivity(activity.Activity):
                         self.hour = 0
 
                     self.waited = 0
+                    self.incorrect_count = 0
+                    self.update_screen = True
+                    self.update_hands = True
                     self.playing = True
                     self.winner = False
 
@@ -451,6 +443,7 @@ class SkyTimeActivity(activity.Activity):
                                 languages=['SkyTimeEnglish'])
                             self._ = lang.ugettext
                             self.mode = 'menu'
+                            self.update_screen = True
 
                         if event.key == K_2:
                             lang = gettext.translation(
@@ -459,6 +452,7 @@ class SkyTimeActivity(activity.Activity):
                                 languages=['SkyTimeSpanish'])
                             self._ = lang.ugettext
                             self.mode = 'menu'
+                            self.update_screen = True
 
                         if event.key == K_3:
                             lang = gettext.translation(
@@ -471,32 +465,46 @@ class SkyTimeActivity(activity.Activity):
                             self.challengeText = pygame.font.Font(
                                 'freesansbold', 34)
                             self.mode = 'menu'
+                            self.update_screen = True
 
+                    # Check what mode the player has selected
                     elif self.mode == 'menu':
-                        # Draw the PlayScreen
+                        # Draw the play screen
                         if event.key == K_1:
                             self.mode = 'play'
+                            self.loadHands()
                             self.playing = True
+                            self.update_screen = True
+                            self.update_hands = True
 
-                        # Draw the ChallengeScreen
+                        # Draw the challenge screen
                         elif event.key == K_2:
                             self.mode = 'challenge'
+                            self.loadHands()
                             self.playing = True
+                            self.update_screen = True
+                            self.update_hands = True
 
                         # Draw How To Play
                         elif event.key == K_3:
                             self.mode = 'howtoplay'
                             self.playing = False
+                            self.update_screen = True
+                            self.update_hands = False
 
                         # Go back to language select
                         elif event.key == K_BACKSPACE:
                             self.mode = 'language'
                             self.playing = False
+                            self.update_screen = True
+                            self.update_hands = False
 
                     # Go back to the menu
                     elif event.key == K_BACKSPACE:
                         self.mode = 'menu'
                         self.playing = False
+                        self.update_screen = True
+                        self.update_hands = False
 
                     # Increments the hour by 1
                     if event.key == K_LSHIFT:
@@ -510,6 +518,7 @@ class SkyTimeActivity(activity.Activity):
                             self.time += '0'
 
                         self.time += str(self.minute)
+                        self.update_hands = True
 
                     # Increments the minutes by 5
                     elif event.key == K_RSHIFT:
@@ -524,6 +533,7 @@ class SkyTimeActivity(activity.Activity):
                             self.time += '0'
 
                         self.time += str(self.minute)
+                        self.update_hands = True
 
                     # Check if the player has the correct time
                     elif event.key == K_RETURN:
@@ -532,7 +542,32 @@ class SkyTimeActivity(activity.Activity):
                             self.mode = 'victory'
                             self.playing = False
                             self.winner = True
+                            self.update_screen = True
+                            self.update_hands = False
                             self.score_count += 1
+
+                            #Award badges
+                            if self.score_count == 1:
+                                self.badges.award('Hair Past a Freckle',
+                                                  'Completed your first time')
+                                if self.mode == 'challenge':
+                                    self.badges.award(
+                                        'Challenge Complete',
+                                        'Completed your first challenge time')
+                            if self.score_count == 5:
+                                self.badges.award(
+                                    'First Five',
+                                    'Obtained your first five suns')
+                            if self.score_count == 100:
+                                self.badges.award('ChronoKeeper',
+                                                  'Obtained 100 suns')
+
+                        elif self.playing:
+                            if self.incorrect_count == 3:
+                                self.badges.award(
+                                    'Rainy Day',
+                                    'Answered incorrectly 3 times in a row')
+                                self.incorrect_count += 1
 
                     # Quit the game
                     elif event.key == K_ESCAPE:
