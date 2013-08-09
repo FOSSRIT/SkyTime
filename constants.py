@@ -9,6 +9,75 @@ time_render_left = box_render_left + (width * .185)
 your_time_render_top = height * .05
 goal_time_render_top = height * .285
 
+CLOCK_REWARDS = ['default', 'green', 'moon', None,
+                 'watermelon', None, None, 'bluemoon']
+
+BACKGROUND_REWARDS = ['default', 'night1', 'night2', 'night3',
+                      None, None, None, None]
+
+REWARDS_DICT = {
+    'clock': {
+        'default': {
+            'earned': True,
+            'value': '0',
+            'color': (0, 0, 0)
+        },
+        'green': {
+            'earned': False,
+            'value': '15',
+            'color': (0, 0, 0)
+        },
+        'moon': {
+            'earned': False,
+            'value': '30',
+            'color': (0, 0, 0)
+        },
+        'watermelon': {
+            'earned': False,
+            'value': '120',
+            'color': (0, 0, 0)
+        },
+        'bluemoon': {
+            'earned': False,
+            'value': '300',
+            'color': (0, 0, 0)
+        },
+        None: {
+            'earned': False,
+            'value': '10000',
+            'color': (0, 0, 0)
+        }
+    },
+    'background': {
+        'default': {
+            'earned': True,
+            'value': '0',
+            'color': (0, 0, 0)
+        },
+        'night1': {
+            'earned': False,
+            'value': '15',
+            'color': (255, 255, 255)
+        },
+        'night2': {
+            'earned': False,
+            'value': '30',
+            'color': (255, 255, 255)
+        },
+        'night3': {
+            'earned': False,
+            'value': '120',
+            'color': (255, 255, 255)
+        },
+        None: {
+            'earned': False,
+            'value': '10000',
+            'color': (0, 0, 0)
+        }
+    }
+
+}
+
 HANDS = {
     'minute': {
         0: {
