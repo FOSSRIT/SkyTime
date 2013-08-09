@@ -518,6 +518,49 @@ while gameloop:
                     mode = 'menu'
                     update_screen = True
 
+            # Check if the player is in the reward screen
+            elif mode == 'rewards':
+                if event.key == K_1:
+                    mode = 'rewards_background'
+
+                elif event.key == K_2:
+                    mode = 'rewards_clock'
+
+                # Go back to the menu
+                elif event.key == K_BACKSPACE:
+                    mode = 'menu'
+                    update_screen = True
+                    update_hands = False
+                    playing = False
+
+            # Check if the player is in the background reward section
+            elif mode == 'rewards_background':
+                if event.key == K_1:
+                    background_style = 'night1'
+
+                elif event.key == K_2:
+                    background_style = 'night2'
+
+                elif event.key == K_3:
+                    background_style = 'night3'
+
+                elif event.key == K_4:
+                    background_style = 'default'
+
+                elif event.key == K_BACKSPACE:
+                    mode = 'rewards'
+
+            # Check if the player is in the clock reward section
+            elif mode == 'rewards_clock':
+                if event.key == K_1:
+                    clock_style = 'moon'
+
+                elif event.key == K_2:
+                    clock_style = 'default'
+
+                elif event.key == K_BACKSPACE:
+                    mode = 'rewards'
+
             # Check what mode the player has selected
             elif mode == 'menu':
                 # Draw the play screen
