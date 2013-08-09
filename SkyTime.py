@@ -6,7 +6,7 @@ import gettext
 from random import randint
 from pygame import transform
 from badges import badges
-from pygame.locals import K_1, K_2, K_3, K_ESCAPE, K_RETURN,\
+from pygame.locals import K_1, K_2, K_3, K_4, K_ESCAPE, K_RETURN,\
     K_LSHIFT, K_RSHIFT, K_BACKSPACE, QUIT, KEYDOWN
 from constants import width, height, clock_render_left, clock_render_top, \
     box_render_left, time_render_left, your_time_render_top, HANDS, \
@@ -24,8 +24,10 @@ update_hands = False
 update_screen = True
 increment = 5
 waited = 0
+display_badge = 0
 mode = 'language'
 prev_mode = 'language'
+badge_awarded = None
 score_count = 0
 incorrect_count = 0
 
@@ -73,7 +75,7 @@ def drawScreen(mode):
             # Display the instructional box
             instructions = pygame.image.load(
                 'images/instruction/box-{}.png'.format(box_style))
-            windowSurfaceObj.blit(instructions, (0, height * .685))
+            windowSurfaceObj.blit(instructions, (0, height * .71))
 
             # Load time box image
             time_box = pygame.image.load(
@@ -114,10 +116,10 @@ def drawScreen(mode):
                 _('When you think the clock is correct, press'),
                 False, pygame.Color(255, 255, 255))
             fw, fh = text.get_size()
-            windowSurfaceObj.blit(text, (width * .44 - (fw / 2), height * .76))
+            windowSurfaceObj.blit(text, (width * .44 - (fw / 2), height * .79))
 
             # Display help text at the bottom of the screen
-            render_top = height * .895
+            render_top = height * .92
             text = infoText.render(
                 _('Hour Hand'), False, pygame.Color(0, 255, 0))
             text2 = infoText.render(
@@ -143,14 +145,22 @@ def drawScreen(mode):
             text = enterButton.render(_('enter'), False, pygame.Color(0, 0, 0))
             fw, fh = text.get_size()
             windowSurfaceObj.blit(
-                text, (width * .885 - (fw / 2), height * .79))
+                text, (width * .885 - (fw / 2), height * .82))
 
             # Display the shift button text
             text = shiftButton.render(_('shift'), False, pygame.Color(0, 0, 0))
             fw, fh = text.get_size()
-            render_top = height * .9
+            render_top = height * .925
             windowSurfaceObj.blit(text, (width * .445 - (fw / 2), render_top))
             windowSurfaceObj.blit(text, (width * .9375 - (fw / 2), render_top))
+
+            # Display go back info
+            back_info = infoText.render(
+                _('Go Back'), False, pygame.Color(0, 0, 0))
+            fw, fh = back_info.get_size()
+            windowSurfaceObj.blit(
+                back_info,
+                ((width * .85) - (fw / 2), (height * .025) - (fh / 2)))
 
         # Draw the menu screen
         elif mode == 'menu':
@@ -180,17 +190,47 @@ def drawScreen(mode):
                 _('How To Play'), False, pygame.Color(0, 0, 0)),
                 (render_left, height * (spacer + (interval * 2))))
 
+            # Display go back info
+            back_info = infoText.render(
+                _('Go Back'), False, pygame.Color(0, 0, 0))
+            fw, fh = back_info.get_size()
+            windowSurfaceObj.blit(
+                back_info,
+                ((width * .85) - (fw / 2), (height * .025) - (fh / 2)))
+
+        # Draw the rewards screen
+        elif mode == 'rewards':
+
+            # Display the screen
+            screen = transform.scale(MenuScreen, (width, height))
+            windowSurfaceObj.blit(screen, (0, 0))
+
+            # Display go back info
+            back_info = infoText.render(
+                _('Go Back'), False, pygame.Color(0, 0, 0))
+            fw, fh = back_info.get_size()
+            windowSurfaceObj.blit(
+                back_info,
+                ((width * .85) - (fw / 2), (height * .025) - (fh / 2)))
+
         # Draw the vicotry screen
         elif mode == 'victory':
-            windowSurfaceObj.blit(victory, (0, 0))
+
+            # Display the screen
+            screen = transform.scale(victory, (width, height))
+            windowSurfaceObj.blit(screen, (0, 0))
 
         # Draw the language selection screen
         elif mode == 'language':
+
+            # Display the screen
             screen = transform.scale(Languages, (width, height))
             windowSurfaceObj.blit(screen, (0, 0))
 
         # Draw the how to play screen
         else:
+
+            # Display the screen
             screen = transform.scale(HowToScreen, (width, height))
             windowSurfaceObj.blit(screen, (0, 0))
 
@@ -248,6 +288,14 @@ def drawScreen(mode):
 
             windowSurfaceObj.blit(text, (width * .205 - (fw / 2), render_top))
             windowSurfaceObj.blit(text, (width * .755 - (fw / 2), render_top))
+
+            # Display go back info
+            back_info = infoText.render(
+                _('Go Back'), False, pygame.Color(0, 0, 0))
+            fw, fh = back_info.get_size()
+            windowSurfaceObj.blit(
+                back_info,
+                ((width * .85) - (fw / 2), (height * .025) - (fh / 2)))
 
     # Update the clock hands
     if update_hands:
@@ -310,6 +358,40 @@ def loadHands():
         HANDS['minute'][i*increment]['image'] = minute_hand
         HANDS['hour'][i]['image'] = hour_hand
 
+
+def displayBadge(image_name):
+
+    # Location of the info text and badge
+    render_top = height * .55
+    render_left = width * .89
+
+    # Display info text
+    info = enterButton.render(
+        _("You have earned badge:"),
+        False, pygame.Color(0, 0, 0))
+    fw, fh = info.get_size()
+    windowSurfaceObj.blit(
+        info, (render_left - (fw / 2), render_top - (fh / 2)))
+
+    # Display badge name
+    badge_name = enterButton.render(
+        _('{}').format(image_name),
+        False, pygame.Color(0, 0, 0))
+
+    fw, fh = badge_name.get_size()
+    windowSurfaceObj.blit(
+        badge_name,
+        (render_left - (fw / 2), render_top + (fh / 2)))
+
+    # Load and scale the badge image
+    badge_image = pygame.image.load('badges/{}.png'.format(image_name))
+    badge_image = transform.scale(badge_image, (width/12, height/10))
+
+    # Display the badge earned
+    iw, ih = badge_image.get_size()
+    windowSurfaceObj.blit(
+        badge_image, (render_left - (iw / 2), render_top + (ih / 2)))
+
 # Generates a new random time
 hour = randint(1, 12)
 minute = random_minute(increment)
@@ -335,8 +417,8 @@ angles = [0, -30, -60, -90, -120, -150, -180,
 # Loads all of the assets
 MenuScreen = pygame.image.load('images/MenuScreen.gif')
 HowToScreen = pygame.image.load('images/HowToScreen.gif')
-ClockCenter = pygame.image.load('images/clock/center-{}.png'.format(
-    center_style))
+ClockCenter = pygame.image.load(
+    'images/clock/center-{}.png'.format(center_style))
 Languages = pygame.image.load('images/language.gif')
 victory = pygame.image.load('images/Sun.gif')
 fontObj = pygame.font.Font('freesansbold.ttf', 32)
@@ -354,6 +436,17 @@ while gameloop:
     drawScreen(mode)
     update_screen = False
     update_hands = False
+
+    # Create a timer for displaying a badge recently earned
+    if badge_awarded is not None and mode != 'victory':
+        display_badge += 1
+        displayBadge(badge_awarded)
+
+        if display_badge > 200:
+            badge_awarded = None
+            update_screen = True
+            update_hands = True
+            display_badge = 0
 
     # Checks if the player won the challenge
     if time == goal_time and winner:
@@ -450,6 +543,13 @@ while gameloop:
                     update_hands = False
                     playing = False
 
+                # Draw Rewards Screen
+                elif event.key == K_4:
+                    mode = 'rewards'
+                    update_screen = True
+                    update_hands = False
+                    playing = False
+
                 # Go back to language select
                 elif event.key == K_BACKSPACE:
                     mode = 'language'
@@ -505,23 +605,32 @@ while gameloop:
                     if score_count == 1:
                         badges.award('Hair Past a Freckle',
                                      'Completed your first time')
+                        badge_awarded = 'Hair Past a Freckle'
+
                         if mode == 'challenge':
                             badges.award('Challenge Complete',
                                          'Completed your first challenge time')
+                            badge_awarded = 'Challenge Complete'
+
                     if score_count == 5:
                         badges.award('First Five',
                                      'Obtained your first five suns')
+                        badge_awarded = 'First Five'
+
                     if score_count == 100:
                         badges.award('ChronoKeeper',
                                      'Obtained 100 suns')
+                        badge_awarded = 'ChronoKeeper'
 
                     mode = 'victory'
                     update_screen = True
 
                 elif playing:
-                    if incorrect_count == 3:
+                    if incorrect_count == 2:
                         badges.award('Rainy Day',
                                      'Answered incorrectly 3 times in a row')
+                        badge_awarded = 'Rainy Day'
+
                     incorrect_count += 1
 
             # Quit the game

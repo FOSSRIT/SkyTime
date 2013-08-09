@@ -461,9 +461,9 @@ class SkyTimeActivity(activity.Activity):
                                 languages=['SkyTimeFrench'])
                             self._ = lang.ugettext
                             self.infoText = pygame.font.Font(
-                                'freesansbold', 22)
+                                'freesansbold.ttf', 22)
                             self.challengeText = pygame.font.Font(
-                                'freesansbold', 34)
+                                'freesansbold.ttf', 34)
                             self.mode = 'menu'
                             self.update_screen = True
 
