@@ -10,7 +10,8 @@ from pygame.locals import K_1, K_2, K_3, K_4, K_ESCAPE, K_RETURN,\
     K_LSHIFT, K_RSHIFT, K_BACKSPACE, QUIT, KEYDOWN, K_LEFT, K_RIGHT
 from constants import width, height, clock_render_left, clock_render_top, \
     box_render_left, time_render_left, your_time_render_top, HANDS, \
-    goal_time_render_top, CLOCK_REWARDS, REWARDS_DICT, BACKGROUND_REWARDS
+    goal_time_render_top, CLOCK_REWARDS, REWARDS_DICT, BACKGROUND_REWARDS, \
+    MENU_OPTIONS, REWARD_OPTIONS
 
 # Declaring Variables
 hour = 12
@@ -27,11 +28,10 @@ waited = 0
 display_badge = 0
 mode = 'language'
 prev_mode = 'language'
-reward_state = ['Clock Faces', 'Backgrounds', 'Hands']
 reward_selected = 0
 cur_reward_state = 'Clock Faces'
 badge_awarded = None
-score_count = 0
+sun_count = 0
 incorrect_count = 0
 text_color = (0, 0, 0)
 
@@ -85,13 +85,22 @@ def drawScreen(mode):
             time_box = pygame.image.load(
                 'images/box/{}.png'.format(time_box_style))
 
+            # Load sun counter image
+            sun = pygame.image.load('images/sun.png')
+            windowSurfaceObj.blit(sun, (width * .6, height * .52))
+
+            # Displays the players score
+            windowSurfaceObj.blit(fontObj.render(
+                str(sun_count), False, text_color),
+                (width * .73, height * .575))
+
             if mode == 'challenge':
                 # Displays your goal time
                 windowSurfaceObj.blit(time_box,
                                      (box_render_left,
                                       goal_time_render_top + (height * .025)))
                 windowSurfaceObj.blit(fontObj.render(
-                    goal_time, False, pygame.Color(0, 0, 0)),
+                    goal_time, False, text_color),
                     (time_render_left, goal_time_render_top + (height * .09)))
                 windowSurfaceObj.blit(fontObj.render(
                     _('Goal Time'), False, text_color),
@@ -109,11 +118,6 @@ def drawScreen(mode):
                 windowSurfaceObj.blit(fontObj.render(
                     _('Goal Time'), False, text_color),
                     (box_render_left, goal_time_render_top))
-
-            # Displays the players score
-            windowSurfaceObj.blit(fontObj.render(
-                str(score_count), False, text_color),
-                (width * .69, height * .56))
 
             # Displays help text
             text = challengeText.render(
@@ -167,31 +171,39 @@ def drawScreen(mode):
 
         # Draw the menu screen
         elif mode == 'menu':
-            render_left = width * .27
+            render_left = width * .35
             interval = .18
-            spacer = .33
+            spacer = .22
 
-            screen = transform.scale(MenuScreen, (width, height))
+            screen = pygame.image.load(
+                'images/background/{}.png'.format(background_style))
+            screen = transform.scale(screen, (width, height))
             windowSurfaceObj.blit(screen, (0, 0))
-            for i in range(0, 3):
-                text = menuText.render(
-                    _('Press'), False, pygame.Color(0, 0, 0))
+
+            for i in range(0, 4):
+
+                # Display 'Play'
+                text = menuText.render(_('Press'), False, text_color)
                 fw, fh = text.get_size()
                 windowSurfaceObj.blit(
                     text, (render_left - (fw / 2), height * spacer))
-                spacer += interval
 
-            render_left = width * .48
-            spacer = .33
-            windowSurfaceObj.blit(menuText.render(
-                _('Play'), False, pygame.Color(0, 0, 0)),
-                (render_left, height * spacer))
-            windowSurfaceObj.blit(menuText.render(
-                _('Challenge'), False, pygame.Color(0, 0, 0)),
-                (render_left, height * (spacer + interval)))
-            windowSurfaceObj.blit(menuText.render(
-                _('How To Play'), False, pygame.Color(0, 0, 0)),
-                (render_left, height * (spacer + (interval * 2))))
+                # Display the button associated with the menu option
+                button = pygame.image.load(
+                    'images/buttons/{}.png'.format(i + 1))
+                iw, ih = button.get_size()
+                button_render_left = render_left + (fw / 2)
+                windowSurfaceObj.blit(
+                    button,
+                    (button_render_left, (height * spacer) - (ih * .28)))
+
+                # Display the menu option name
+                option = menuText.render(_(MENU_OPTIONS[i]), False, text_color)
+                fw, fh = option.get_size()
+                windowSurfaceObj.blit(
+                    option, (button_render_left + iw, (height * spacer)))
+
+                spacer += interval
 
             # Display go back info
             back_info = infoText.render(_('Go Back'), False, text_color)
@@ -214,7 +226,7 @@ def drawScreen(mode):
             counter = 1
 
             # Draw the different reward titles at the top
-            for title in reward_state:
+            for title in REWARD_OPTIONS:
 
                 # Check what current state the user is in
                 if title == cur_reward_state:
@@ -232,7 +244,7 @@ def drawScreen(mode):
                     title_text, (render_left, render_top - (fh / 2)))
 
                 num_tab = pygame.image.load(
-                    'images/rewards/{}.png'.format(counter))
+                    'images/buttons/{}.png'.format(counter))
                 iw, ih = num_tab.get_size()
                 windowSurfaceObj.blit(
                     num_tab, (render_left - iw, render_top - (ih / 2)))
@@ -276,18 +288,15 @@ def drawScreen(mode):
                         reward_image, (width/6, height/5))
                     rw, rh = reward_image.get_size()
 
+                    # Check if the user has this reward selected
+                    if counter == reward_selected:
+                        border = pygame.image.load(
+                            'images/rewards/selected.png')
+
                     # Check if the user has earned this reward
-                    if REWARDS_DICT[cur_state][reward]['earned']:
-
-                        # Check if the user has this reward selected
-                        if counter == reward_selected:
-                            border = pygame.image.load(
-                                'images/rewards/selected.png')
-
-                        # Reward is not selected
-                        else:
-                            border = pygame.image.load(
-                                'images/rewards/earned.png')
+                    elif REWARDS_DICT[cur_state][reward]['earned']:
+                        border = pygame.image.load(
+                            'images/rewards/earned.png')
 
                     # User has not earned this reward
                     else:
@@ -344,8 +353,15 @@ def drawScreen(mode):
 
                 # Temporary place holder for a reward that doesn't exist
                 else:
-                    border = pygame.image.load(
-                        'images/rewards/unearned.png')
+
+                    # Check if the user has this reward selected
+                    if counter == reward_selected:
+                        border = pygame.image.load(
+                            'images/rewards/selected.png')
+
+                    else:
+                        border = pygame.image.load(
+                            'images/rewards/unearned.png')
 
                     border = transform.scale(border, (width/5, height/4))
                     bw, bh = border.get_size()
@@ -497,7 +513,7 @@ def drawScreen(mode):
                     (time_render_left,
                      your_time_render_top + (height * .09)))
                 windowSurfaceObj.blit(fontObj.render(
-                    _('Your Time'), False, pygame.Color(0, 0, 0)),
+                    _('Your Time'), False, text_color),
                     (box_render_left, your_time_render_top))
 
 
@@ -596,7 +612,7 @@ while gameloop:
     update_hands = False
 
     # Create a timer for displaying a badge recently earned
-    if badge_awarded is not None and mode != 'victory':
+    if badge_awarded is not None and playing:
         display_badge += 1
         displayBadge(badge_awarded)
 
@@ -647,6 +663,8 @@ while gameloop:
 
             # Check what language the player has selected
             if mode == 'language':
+
+                # Play the game in English
                 if event.key == K_1:
                     lang = gettext.translation(
                         'org.laptop.SkyTime',
@@ -656,6 +674,7 @@ while gameloop:
                     mode = 'menu'
                     update_screen = True
 
+                # Play the game in Spanish
                 elif event.key == K_2:
                     lang = gettext.translation(
                         'org.laptop.SkyTime',
@@ -665,6 +684,7 @@ while gameloop:
                     mode = 'menu'
                     update_screen = True
 
+                # Play the game in French
                 elif event.key == K_3:
                     lang = gettext.translation(
                         'org.laptop.SkyTime',
@@ -682,16 +702,19 @@ while gameloop:
                 # Display the clock face rewards
                 if event.key == K_1:
                     cur_reward_state = 'Clock Faces'
+                    reward_selected = 0
                     update_screen = True
 
                 # Display the background rewards
                 elif event.key == K_2:
                     cur_reward_state = 'Backgrounds'
+                    reward_selected = 0
                     update_screen = True
 
                 # Display the hand rewards
                 elif event.key == K_3:
                     cur_reward_state = 'Hands'
+                    reward_selected = 0
                     update_screen = True
 
                 # Go back to the menu
@@ -702,6 +725,49 @@ while gameloop:
                     update_hands = False
                     playing = False
 
+                # The user selected a reward
+                elif event.key == K_RETURN:
+
+                    # Selected a clock face reward
+                    if cur_reward_state == 'Clock Faces':
+                        reward = REWARDS_DICT['clock'][
+                            CLOCK_REWARDS[reward_selected]]
+
+                        # Check if the user has already earned this reward
+                        if reward['earned']:
+                            clock_style = CLOCK_REWARDS[reward_selected]
+                            update_screen = True
+
+                        # Check if the user has enough for the reward
+                        elif sun_count >= int(reward['value']):
+                            sun_count -= int(reward['value'])
+                            reward['earned'] = True
+                            clock_style = CLOCK_REWARDS[reward_selected]
+                            update_screen = True
+
+                    # Selected a background reward
+                    elif cur_reward_state == 'Backgrounds':
+                        reward = REWARDS_DICT['background'][
+                            BACKGROUND_REWARDS[reward_selected]]
+
+                        # Check if the use has already earned this reward
+                        if reward['earned']:
+                            background_style = BACKGROUND_REWARDS[
+                                reward_selected]
+                            text_color = REWARDS_DICT['background'][
+                                background_style]['color']
+                            update_screen = True
+
+                        # Check if the user has enough for the reward
+                        elif sun_count >= int(reward['value']):
+                            sun_count -= int(reward['value'])
+                            reward['earned'] = True
+                            background_style = BACKGROUND_REWARDS[
+                                reward_selected]
+                            text_color = REWARDS_DICT['background'][
+                                background_style]['color']
+                            update_screen = True
+
                 # Move cursor to the left
                 elif event.key == K_LEFT:
                     if cur_reward_state == 'Clock Faces':
@@ -710,7 +776,7 @@ while gameloop:
                         else:
                             reward_selected -= 1
 
-                    if cur_reward_state == 'Backgrounds':
+                    elif cur_reward_state == 'Backgrounds':
                         if reward_selected == 0:
                             reward_selected = len(BACKGROUND_REWARDS) - 1
                         else:
@@ -773,41 +839,53 @@ while gameloop:
                     update_hands = False
                     playing = False
 
-            # Go back to the menu
-            elif event.key == K_BACKSPACE:
-                mode = 'menu'
-                update_screen = True
-                update_hands = False
-                playing = False
+            elif mode == 'howtoplay':
 
-            # Increments the hour by 1
-            if event.key == K_LSHIFT:
-                hour += 1
-                if hour > 11:
-                    hour = 0
-                    time = '12:'
-                else:
-                    time = str(hour) + ':'
-                if minute < 10:
-                    time += '0'
+                # Go back to the menu
+                if event.key == K_BACKSPACE:
+                    mode = 'menu'
+                    update_screen = True
+                    update_hands = False
+                    playing = False
 
-                time += str(minute)
-                update_hands = True
+            # Check if the user is playing the game
+            if playing:
 
-            # Increments the minutes by 5
-            if event.key == K_RSHIFT:
-                minute += increment
-                if hour == 0:
-                    time = '12:'
-                else:
-                    time = str(hour) + ':'
-                if minute == 60:
-                    minute = 0
-                if minute < 10:
-                    time += '0'
+                # Increments the hour by 1
+                if event.key == K_LSHIFT:
+                    hour += 1
+                    if hour > 11:
+                        hour = 0
+                        time = '12:'
+                    else:
+                        time = str(hour) + ':'
+                    if minute < 10:
+                        time += '0'
 
-                time += str(minute)
-                update_hands = True
+                    time += str(minute)
+                    update_hands = True
+
+                # Increments the minutes by 5
+                if event.key == K_RSHIFT:
+                    minute += increment
+                    if hour == 0:
+                        time = '12:'
+                    else:
+                        time = str(hour) + ':'
+                    if minute == 60:
+                        minute = 0
+                    if minute < 10:
+                        time += '0'
+
+                    time += str(minute)
+                    update_hands = True
+
+                # Go back to the menu
+                elif event.key == K_BACKSPACE:
+                    mode = 'menu'
+                    update_screen = True
+                    update_hands = False
+                    playing = False
 
             # Check if the player has the correct time
             if event.key == K_RETURN:
@@ -815,10 +893,10 @@ while gameloop:
                     prev_mode = mode
                     playing = False
                     winner = True
-                    score_count += 1
+                    sun_count += 1
 
                     # Award badges
-                    if score_count == 1:
+                    if sun_count == 1:
                         badges.award('Hair Past a Freckle',
                                      'Completed your first time')
                         badge_awarded = 'Hair Past a Freckle'
@@ -828,12 +906,12 @@ while gameloop:
                                          'Completed your first challenge time')
                             badge_awarded = 'Challenge Complete'
 
-                    if score_count == 5:
+                    if sun_count == 5:
                         badges.award('First Five',
                                      'Obtained your first five suns')
                         badge_awarded = 'First Five'
 
-                    if score_count == 100:
+                    if sun_count == 100:
                         badges.award('ChronoKeeper',
                                      'Obtained 100 suns')
                         badge_awarded = 'ChronoKeeper'
