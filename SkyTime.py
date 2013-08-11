@@ -98,7 +98,7 @@ def drawScreen(mode):
                 # Displays your goal time
                 windowSurfaceObj.blit(time_box,
                                      (box_render_left,
-                                      goal_time_render_top + (height * .04)))
+                                      goal_time_render_top + (height * .045)))
                 windowSurfaceObj.blit(fontObj.render(
                     goal_time, False, text_color),
                     (time_render_left, goal_time_render_top + (height * .09)))
@@ -111,7 +111,7 @@ def drawScreen(mode):
                 # Displays your goal time
                 windowSurfaceObj.blit(time_box,
                                      (box_render_left,
-                                      goal_time_render_top + (height * .04)))
+                                      goal_time_render_top + (height * .045)))
                 windowSurfaceObj.blit(fontObj.render(
                     goal_time, False, pygame.Color(0, 0, 0)),
                     (time_render_left, goal_time_render_top + (height * .09)))
@@ -507,7 +507,7 @@ def drawScreen(mode):
                 # Displays your time
                 windowSurfaceObj.blit(time_box,
                                      (box_render_left,
-                                      your_time_render_top + (height * .04)))
+                                      your_time_render_top + (height * .045)))
                 windowSurfaceObj.blit(fontObj.render(
                     time, False, pygame.Color(0, 0, 0)),
                     (time_render_left,
