@@ -869,6 +869,8 @@ while gameloop:
                         time += '0'
 
                     time += str(minute)
+                    pygame.mixer.music.load('sounds/hour.wav')
+                    pygame.mixer.music.play()
                     update_hands = True
 
                 # Increments the minutes by 5
@@ -884,6 +886,8 @@ while gameloop:
                         time += '0'
 
                     time += str(minute)
+                    pygame.mixer.music.load('sounds/minute.wav')
+                    pygame.mixer.music.play()
                     update_hands = True
 
                 # Go back to the menu
