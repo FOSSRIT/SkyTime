@@ -17,7 +17,7 @@ CLOCK_REWARDS = ['default', 'green', 'moon', 'purple',
                  'watermelon', 'spikeysun', None, 'bluemoon']
 
 BACKGROUND_REWARDS = ['default', 'night cloudy', 'night clear',
-                      None, None, None, None, None]
+                      'rainbow', 'sunset', 'rain', None, None]
 
 REWARDS_DICT = {
     'clock': {
@@ -70,13 +70,28 @@ REWARDS_DICT = {
         },
         'night cloudy': {
             'earned': False,
-            'value': '1',
+            'value': '15',
             'color': (255, 255, 255)
         },
         'night clear': {
             'earned': False,
             'value': '30',
             'color': (255, 255, 255)
+        },
+        'rainbow': {
+            'earned': False,
+            'value': '75',
+            'color': (0, 0, 0)
+        },
+        'sunset': {
+            'earned': False,
+            'value': '125',
+            'color': (0, 0, 0)
+        },
+        'rain': {
+            'earned': False,
+            'value': '175',
+            'color': (0, 0, 0)
         },
         None: {
             'earned': False,

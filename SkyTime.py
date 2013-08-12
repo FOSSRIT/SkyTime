@@ -23,6 +23,7 @@ winner = False
 gameloop = True
 update_hands = False
 update_screen = True
+play_victory = False
 increment = 5
 waited = 0
 display_badge = 0
@@ -626,7 +627,12 @@ while gameloop:
     if time == goal_time and winner:
         waited += 1
 
-        if waited > 100:
+        if play_victory:
+            pygame.mixer.music.load('sounds/jenn-yay.wav')
+            pygame.mixer.music.play()
+            play_victory = False
+
+        if waited > 200:
 
             # Generates a new random time
             hour = randint(1, 12)
@@ -893,6 +899,7 @@ while gameloop:
                     prev_mode = mode
                     playing = False
                     winner = True
+                    play_victory = True
                     sun_count += 1
 
                     # Award badges
