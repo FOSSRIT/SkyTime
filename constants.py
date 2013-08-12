@@ -14,7 +14,7 @@ REWARD_OPTIONS = ['Clock Faces', 'Backgrounds', 'Hands']
 MENU_OPTIONS = ['Play', 'Challenge', 'How To Play', 'Rewards']
 
 CLOCK_REWARDS = ['default', 'green', 'moon', 'purple',
-                 'watermelon', 'spikeysun', None, 'bluemoon']
+                 'watermelon', 'spikeysun', 'earth', 'bluemoon']
 
 BACKGROUND_REWARDS = ['default', 'night cloudy', 'night clear',
                       'rainbow', 'sunset', 'rain', None, 'northern-lights']
@@ -54,6 +54,11 @@ REWARDS_DICT = {
         'bluemoon': {
             'earned': False,
             'value': '300',
+            'color': (0, 0, 0)
+        },
+        'earth': {
+            'earned': False,
+            'value': '225',
             'color': (0, 0, 0)
         },
         None: {
