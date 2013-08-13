@@ -2,6 +2,7 @@
 
 import pygame
 import gettext
+import os
 
 from random import randint
 from pygame import transform
@@ -24,15 +25,17 @@ gameloop = True
 update_hands = False
 update_screen = True
 play_victory = False
+clock_rewards = []
+background_rewards = []
 increment = 5
 waited = 0
 display_badge = 0
+sun_count = 0
 mode = 'language'
 prev_mode = 'language'
 reward_selected = 0
 cur_reward_state = 'Clock Faces'
 badge_awarded = None
-sun_count = 0
 incorrect_count = 0
 text_color = (0, 0, 0)
 
@@ -169,6 +172,34 @@ def drawScreen(mode):
             windowSurfaceObj.blit(
                 back_info,
                 ((width * .85) - (fw / 2), (height * .025) - (fh / 2)))
+
+        # Draw the loading screen
+        elif mode == 'loading':
+
+            screen = pygame.image.load(
+                'images/background/{}.png'.format(background_style))
+            screen = transform.scale(screen, (width, height))
+            windowSurfaceObj.blit(screen, (0, 0))
+
+            render_left = width * .33
+            render_top = height * .4
+            new_game_button = pygame.image.load('images/buttons/1.png')
+            iw, ih = new_game_button.get_size()
+            windowSurfaceObj.blit(
+                new_game_button, (render_left, render_top - (ih / 2)))
+
+            new_game = menuText.render(_('New Game'), False, text_color)
+            fw, fh = new_game.get_size()
+            windowSurfaceObj.blit(
+                new_game, (render_left + iw, render_top - (fh / 2)))
+
+            load_game_button = pygame.image.load('images/buttons/2.png')
+            windowSurfaceObj.blit(
+                load_game_button, (render_left, render_top + ih))
+
+            load_game = menuText.render(_('Load Game'), False, text_color)
+            windowSurfaceObj.blit(
+                load_game, (render_left + iw, render_top + ih + (fh / 2)))
 
         # Draw the menu screen
         elif mode == 'menu':
@@ -673,7 +704,7 @@ while gameloop:
                         'locale/',
                         languages=['SkyTimeEnglish'])
                     _ = lang.ugettext
-                    mode = 'menu'
+                    mode = 'loading'
                     update_screen = True
 
                 # Play the game in Spanish
@@ -683,7 +714,7 @@ while gameloop:
                         'locale/',
                         languages=['SkyTimeSpanish'])
                     _ = lang.ugettext
-                    mode = 'menu'
+                    mode = 'loading'
                     update_screen = True
 
                 # Play the game in French
@@ -695,6 +726,32 @@ while gameloop:
                     _ = lang.ugettext
                     infoText = pygame.font.Font('freesansbold.ttf', 22)
                     challengeText = pygame.font.Font('freesansbold.ttf', 34)
+                    mode = 'loading'
+                    update_screen = True
+
+            # Load a saved game or create a new game
+            elif mode == 'loading':
+                path = os.path.join(
+                    os.path.split(__file__)[0], 'saved.txt')
+                if event.key == K_1:
+                    with open(path) as saved_game:
+                        pass
+                    mode = 'menu'
+                    update_screen = True
+
+                elif event.key == K_2:
+                    with open(path) as saved_game:
+                        for line in saved_game:
+                            line = line.rsplit()[0]
+                            reward = line.split(':')[1]
+                            reward_type = line.split(':')[0]
+
+                            if reward_type == 'score':
+                                sun_count = int(reward)
+
+                            else:
+                                REWARDS_DICT[
+                                    reward_type][reward]['earned'] = True
                     mode = 'menu'
                     update_screen = True
 
@@ -737,6 +794,7 @@ while gameloop:
                         # Check if the user has enough for the reward
                         elif sun_count >= int(reward['value']):
                             sun_count -= int(reward['value'])
+                            clock_rewards.append('clock:' + reward['name'])
                             reward['earned'] = True
                             clock_style = CLOCK_REWARDS[reward_selected]
                             update_screen = True
@@ -758,6 +816,8 @@ while gameloop:
                         elif sun_count >= int(reward['value']):
                             sun_count -= int(reward['value'])
                             reward['earned'] = True
+                            background_rewards.append(
+                                'background:' + reward['name'])
                             background_style = BACKGROUND_REWARDS[
                                 reward_selected]
                             text_color = REWARDS_DICT['background'][
@@ -934,3 +994,14 @@ while gameloop:
 
     if gameloop:
         pygame.display.update()
+
+path = os.path.join(
+    os.path.split(__file__)[0], 'saved.txt')
+with open(path, mode='w') as saved_game:
+    for clock_reward in REWARDS_DICT['clock'].values():
+        if clock_reward['earned']:
+            saved_game.write('clock:' + clock_reward['name'] + '\n')
+    for bg_reward in REWARDS_DICT['background'].values():
+        if bg_reward['earned']:
+            saved_game.write('background:' + bg_reward['name'] + '\n')
+    saved_game.write('score:' + str(sun_count))
