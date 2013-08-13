@@ -733,25 +733,36 @@ while gameloop:
             elif mode == 'loading':
                 path = os.path.join(
                     os.path.split(__file__)[0], 'saved.txt')
+
                 if event.key == K_1:
-                    with open(path) as saved_game:
-                        pass
+
+                    new_game = open(path, 'w')
+                    new_game.close()
                     mode = 'menu'
                     update_screen = True
 
                 elif event.key == K_2:
-                    with open(path) as saved_game:
-                        for line in saved_game:
-                            line = line.rsplit()[0]
-                            reward = line.split(':')[1]
-                            reward_type = line.split(':')[0]
 
-                            if reward_type == 'score':
-                                sun_count = int(reward)
+                    # Try to load a saved game
+                    try:
+                        with open(path) as saved_game:
+                            for line in saved_game:
+                                line = line.rsplit()[0]
+                                reward = line.split(':')[1]
+                                reward_type = line.split(':')[0]
 
-                            else:
-                                REWARDS_DICT[
-                                    reward_type][reward]['earned'] = True
+                                if reward_type == 'score':
+                                    sun_count = int(reward)
+
+                                else:
+                                    REWARDS_DICT[
+                                        reward_type][reward]['earned'] = True
+
+                    # If a saved game doesn't exist, create a new one
+                    except IOError:
+                        new_game = open(path, 'w')
+                        new_game.close()
+
                     mode = 'menu'
                     update_screen = True
 
