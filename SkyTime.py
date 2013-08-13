@@ -263,10 +263,6 @@ def drawScreen(mode):
                 rewards = BACKGROUND_REWARDS
                 cur_state = 'background'
 
-            else:
-                rewards = CLOCK_REWARDS
-                cur_state = 'clock'
-
             counter = 0
             column = 0
             row = 0
@@ -714,12 +710,6 @@ while gameloop:
                 # Display the background rewards
                 elif event.key == K_2:
                     cur_reward_state = 'Backgrounds'
-                    reward_selected = 0
-                    update_screen = True
-
-                # Display the hand rewards
-                elif event.key == K_3:
-                    cur_reward_state = 'Hands'
                     reward_selected = 0
                     update_screen = True
 

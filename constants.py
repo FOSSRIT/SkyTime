@@ -9,15 +9,15 @@ time_render_left = box_render_left + (width * .185)
 your_time_render_top = height * .05
 goal_time_render_top = height * .285
 
-REWARD_OPTIONS = ['Clock Faces', 'Backgrounds', 'Hands']
+REWARD_OPTIONS = ['Clock Faces', 'Backgrounds']
 
 MENU_OPTIONS = ['Play', 'Challenge', 'How To Play', 'Rewards']
 
 CLOCK_REWARDS = ['default', 'green', 'moon', 'purple',
-                 'watermelon', 'spikeysun', None, 'bluemoon']
+                 'watermelon', 'spikeysun', 'earth', 'bluemoon']
 
 BACKGROUND_REWARDS = ['default', 'night cloudy', 'night clear',
-                      'rainbow', 'sunset', 'rain', None, 'northern-lights']
+                      'rainbow', 'sunset', 'rain', 'galaxy', 'northern-lights']
 
 REWARDS_DICT = {
     'clock': {
@@ -56,9 +56,9 @@ REWARDS_DICT = {
             'value': '300',
             'color': (0, 0, 0)
         },
-        None: {
+        'earth': {
             'earned': False,
-            'value': '10000',
+            'value': '225',
             'color': (0, 0, 0)
         }
     },
@@ -98,13 +98,12 @@ REWARDS_DICT = {
             'value': '300',
             'color': (0, 0, 0)
         },
-        None: {
+        'galaxy': {
             'earned': False,
-            'value': '10000',
+            'value': '225',
             'color': (0, 0, 0)
         }
     }
-
 }
 
 HANDS = {
