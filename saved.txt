@@ -1,3 +1,0 @@
-clock:default
-background:default
-score:0
