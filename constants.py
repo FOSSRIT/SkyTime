@@ -120,7 +120,9 @@ REWARDS_DICT = {
             'color': (255, 255, 255)
         }
     },
-    'score': '0'
+    'score': '0',
+    'number_clocks': 0,
+    'number_backgrounds': 0
 }
 
 HANDS = {
