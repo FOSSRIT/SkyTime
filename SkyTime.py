@@ -134,7 +134,7 @@ class SkyTime():
                         (box_render_left,
                          goal_time_render_top + (height * .045)))
                     self.windowSurfaceObj.blit(self.fontObj.render(
-                        self.goal_time, False, self.text_color),
+                        self.goal_time, False, pygame.Color(0, 0, 0)),
                         (time_render_left,
                          goal_time_render_top + (height * .09)))
                     self.windowSurfaceObj.blit(self.fontObj.render(
