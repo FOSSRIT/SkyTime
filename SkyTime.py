@@ -297,6 +297,36 @@ class SkyTime():
                 screen = transform.scale(background, (width, height))
                 self.windowSurfaceObj.blit(screen, (0, 0))
 
+                # Display the amount of suns the player has
+                sun_counter = pygame.image.load(
+                    'images/rewards/sun-counter.png')
+                iw, ih = sun_counter.get_size()
+
+                your_suns = self.infoText.render(
+                    self._('You have'),
+                    False, self.text_color)
+                fw, fh = your_suns.get_size()
+
+                number_suns = self.infoText.render(
+                    str(self.sun_count),
+                    False, self.text_color)
+
+                render_left = width * .175
+                render_top = height * .14
+
+                self.windowSurfaceObj.blit(
+                    your_suns,
+                    (render_left - (fw / 2),
+                     render_top - (fh / 2)))
+                self.windowSurfaceObj.blit(
+                    sun_counter,
+                    (render_left + (fw / 2),
+                     render_top - (ih / 2)))
+                self.windowSurfaceObj.blit(
+                    number_suns,
+                    (render_left + (fw / 2) + iw,
+                     render_top - (fh / 2)))
+
                 spacer = .2
                 interval = .3
                 counter = 1
@@ -315,7 +345,7 @@ class SkyTime():
                     fw, fh = title_text.get_size()
 
                     render_left = (width * spacer) - (fw / 2)
-                    render_top = height * .09
+                    render_top = height * .05
 
                     self.windowSurfaceObj.blit(
                         title_text, (render_left, render_top - (fh / 2)))
@@ -695,6 +725,7 @@ class SkyTime():
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
+                    self.gameloop = False
 
                 # Check for input and draw information
                 elif event.type == KEYDOWN and self.winner is False:
