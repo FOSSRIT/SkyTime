@@ -68,11 +68,13 @@ class SkyTime():
         self.menuScreen = pygame.image.load('images/MenuScreen.gif')
         self.howToScreen = pygame.image.load('images/HowToScreen.gif')
         self.clockCenter = pygame.image.load('images/clock_center/default.png')
-        self.languages = pygame.image.load('images/language.gif')
+        self.languages = pygame.image.load('images/language.png')
+        self.delete = pygame.image.load('images/buttons/delete.png')
         self.victory = pygame.image.load('images/Sun.gif')
         self.fontObj = pygame.font.Font('freesansbold.ttf', 32)
         self.menuText = pygame.font.Font('freesansbold.ttf', 52)
         self.infoText = pygame.font.Font('freesansbold.ttf', 28)
+        self.value = pygame.font.Font('freesansbold.ttf', 28)
         self.helpText = pygame.font.Font('freesansbold.ttf', 28)
         self.challengeText = pygame.font.Font('freesansbold.ttf', 42)
         self.howToPlay = pygame.font.Font('freesansbold.ttf', 65)
@@ -210,7 +212,15 @@ class SkyTime():
                 fw, fh = back_info.get_size()
                 self.windowSurfaceObj.blit(
                     back_info,
-                    ((width * .85) - (fw / 2), (height * .025) - (fh / 2)))
+                    ((width * .8) - (fw / 2), (height * .04) - (fh / 2)))
+
+                button = transform.scale(self.delete, (width/8, height/15))
+                self.windowSurfaceObj.blit(button, (width * .85, height * .01))
+
+                erase = self.enterButton.render(
+                    self._('erase'), False, pygame.Color(0, 0, 0))
+                self.windowSurfaceObj.blit(
+                    erase, (width * .885, height * .027))
 
             # Draw the loading screen
             elif self.mode == 'loading':
@@ -286,7 +296,15 @@ class SkyTime():
                 fw, fh = back_info.get_size()
                 self.windowSurfaceObj.blit(
                     back_info,
-                    ((width * .85) - (fw / 2), (height * .025) - (fh / 2)))
+                    ((width * .8) - (fw / 2), (height * .04) - (fh / 2)))
+
+                button = transform.scale(self.delete, (width/8, height/15))
+                self.windowSurfaceObj.blit(button, (width * .85, height * .01))
+
+                erase = self.enterButton.render(
+                    self._('erase'), False, pygame.Color(0, 0, 0))
+                self.windowSurfaceObj.blit(
+                    erase, (width * .885, height * .027))
 
             # Draw the rewards screen
             elif self.mode == 'rewards':
@@ -303,13 +321,9 @@ class SkyTime():
                 iw, ih = sun_counter.get_size()
 
                 your_suns = self.infoText.render(
-                    self._('You have'),
+                    self._('You have {}').format(self.sun_count),
                     False, self.text_color)
                 fw, fh = your_suns.get_size()
-
-                number_suns = self.infoText.render(
-                    str(self.sun_count),
-                    False, self.text_color)
 
                 render_left = width * .175
                 render_top = height * .14
@@ -318,14 +332,21 @@ class SkyTime():
                     your_suns,
                     (render_left - (fw / 2),
                      render_top - (fh / 2)))
+
                 self.windowSurfaceObj.blit(
                     sun_counter,
                     (render_left + (fw / 2),
                      render_top - (ih / 2)))
+
+                help_text = self.infoText.render(
+                    self._('Press enter to select your design'),
+                    False, self.text_color)
+                fw, fh = help_text.get_size()
+
                 self.windowSurfaceObj.blit(
-                    number_suns,
-                    (render_left + (fw / 2) + iw,
-                     render_top - (fh / 2)))
+                    help_text,
+                    ((width * .7) - (fw / 2),
+                     (render_top - (fh / 2))))
 
                 spacer = .2
                 interval = .3
@@ -427,7 +448,7 @@ class SkyTime():
                             (render_top + (row * spacer_row) - (rh / 2))))
 
                     # Display the number of suns the reward costs
-                    cost = self.infoText.render(
+                    cost = self.value.render(
                         REWARDS_DICT[cur_state][reward]['value'],
                         False, self.text_color)
                     fw, fh = cost.get_size()
@@ -461,7 +482,15 @@ class SkyTime():
                 fw, fh = back_info.get_size()
                 self.windowSurfaceObj.blit(
                     back_info,
-                    ((width * .85) - (fw / 2), (height * .025) - (fh / 2)))
+                    ((width * .8) - (fw / 2), (height * .04) - (fh / 2)))
+
+                button = transform.scale(self.delete, (width/8, height/15))
+                self.windowSurfaceObj.blit(button, (width * .85, height * .01))
+
+                erase = self.enterButton.render(
+                    self._('erase'), False, pygame.Color(0, 0, 0))
+                self.windowSurfaceObj.blit(
+                    erase, (width * .885, height * .027))
 
             # Draw the vicotry screen
             elif self.mode == 'victory':
@@ -552,8 +581,15 @@ class SkyTime():
                 fw, fh = back_info.get_size()
                 self.windowSurfaceObj.blit(
                     back_info,
-                    ((width * .85) - (fw / 2),
-                     (height * .025) - (fh / 2)))
+                    ((width * .8) - (fw / 2), (height * .04) - (fh / 2)))
+
+                button = transform.scale(self.delete, (width/8, height/15))
+                self.windowSurfaceObj.blit(button, (width * .85, height * .01))
+
+                erase = self.enterButton.render(
+                    self._('erase'), False, pygame.Color(0, 0, 0))
+                self.windowSurfaceObj.blit(
+                    erase, (width * .885, height * .027))
 
         # Update the clock hands
         if self.update_hands:

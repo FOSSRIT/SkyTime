@@ -88,3 +88,30 @@ msgstr "mano de el minuto"
 #: PCST.py:207 PCST.py:212
 msgid "shift"
 msgstr "mayus"
+
+msgid "New Game"
+msgstr "Nuevo Juego"
+
+msgid "Load Game"
+msgstr "Cargar Juego"
+
+msgid "Rewards"
+msgstr "Recompensas"
+
+msgid "Go Back"
+msgstr "Volver"
+
+msgid "You have {}"
+msgstr "Tienes {}"
+
+msgid "Clock Faces"
+msgstr "Caras del Reloj"
+
+msgid "Backgrounds"
+msgstr "Fondos"
+
+msgid "Press enter to select your design"
+msgstr "Pulse enter para seleccionar el diseño de su"
+
+msgid "erase"
+msgstr "borrar"

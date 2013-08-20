@@ -88,3 +88,27 @@ msgstr "l'aiguille des minutes"
 #: PCST.py:207 PCST.py:212
 msgid "shift"
 msgstr "shift"
+
+msgid "New Game"
+msgstr "Nouveau Jeu"
+
+msgid "Load Game"
+msgstr "Jeu de Charge"
+
+msgid "Rewards"
+msgstr "Récompenses"
+
+msgid "Go Back"
+msgstr "Retour"
+
+msgid "You have {}"
+msgstr "Vous avez {}"
+
+msgid "Clock Faces"
+msgstr "Des cadrans d'horloge"
+
+msgid "Backgrounds"
+msgstr "Milieux"
+
+msgid "Press enter to select your design"
+msgstr "Appuyez enter pour sélectionner votre conception"
