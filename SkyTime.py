@@ -65,7 +65,6 @@ class SkyTime():
                        -210, -240, -270, -300, -330]
 
         # Loads all of the assets
-        self.menuScreen = pygame.image.load('images/MenuScreen.gif')
         self.howToScreen = pygame.image.load('images/HowToScreen.gif')
         self.clockCenter = pygame.image.load('images/clock_center/default.png')
         self.languages = pygame.image.load('images/language.png')
