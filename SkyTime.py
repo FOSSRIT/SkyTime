@@ -17,7 +17,7 @@ from constants import width, height, clock_render_left, clock_render_top, \
 
 class SkyTime():
 
-    def __init__(self):
+    def __init__(self, bundle_id="org.laptop.SkyTime"):
 
         # Declaring Variables
         self.hour = 12
@@ -53,7 +53,7 @@ class SkyTime():
         self.box_style = 'default'
         self.time_box_style = 'white'
 
-        self.badges = badges("SkyTime", "org.laptop.SkyTime")
+        self.badges = badges("SkyTime", bundle_id)
 
         # Initializes pygame and the screen Surface object
         pygame.init()
@@ -953,7 +953,7 @@ class SkyTime():
                                         self.reward_selected]
                                     self.text_color = REWARDS_DICT[
                                         'background'][self.background_style][
-                                            'color']
+                                        'color']
                                     self.update_screen = True
 
                                 # Check if the user has enough for the reward
@@ -967,7 +967,7 @@ class SkyTime():
                                         self.reward_selected]
                                     self.text_color = REWARDS_DICT[
                                         'background'][self.background_style][
-                                            'color']
+                                        'color']
                                     self.update_screen = True
 
                                 # Award badges

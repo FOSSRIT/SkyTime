@@ -10,4 +10,4 @@ class SkyTimeActivity(Activity):
         Activity.__init__(self, handle)
         print "activity running"
 
-        SkyTime()
+        SkyTime(self.get_bundle_id())
