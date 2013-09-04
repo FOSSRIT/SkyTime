@@ -9,10 +9,13 @@ from pygame import transform
 from badges import badges
 from pygame.locals import K_1, K_2, K_3, K_4, K_ESCAPE, K_RETURN,\
     K_LSHIFT, K_RSHIFT, K_BACKSPACE, QUIT, KEYDOWN, K_LEFT, K_RIGHT
+
 from constants import width, height, clock_render_left, clock_render_top, \
     box_render_left, time_render_left, your_time_render_top, HANDS, \
     goal_time_render_top, CLOCK_REWARDS, REWARDS_DICT, BACKGROUND_REWARDS, \
     MENU_OPTIONS, REWARD_OPTIONS
+
+from gi.repository import Gtk
 
 
 class SkyTime():
@@ -704,6 +707,9 @@ class SkyTime():
 
         # Loop the game until the player quits
         while self.gameloop:
+
+            while Gtk.events_pending():
+                Gtk.main_interation()
 
             self.drawScreen()
             self.update_screen = False
