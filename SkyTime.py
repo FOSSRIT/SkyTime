@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import pygame
+from gi.repository import Gtk
 import gettext
 import os
 
@@ -61,6 +62,7 @@ class SkyTime():
                        -210, -240, -270, -300, -330]
 
         # Loads all of the assets
+        pygame.font.init()
         self.howToScreen = pygame.image.load('images/HowToScreen.gif')
         self.clockCenter = pygame.image.load('images/clock_center/default.png')
         self.languages = pygame.image.load('images/language.png')
@@ -701,6 +703,9 @@ class SkyTime():
 
         # Loop the game until the player quits
         while self.gameloop:
+
+            while Gtk.events_pending():
+                Gtk.main_iteration()
 
             self.drawScreen()
             self.update_screen = False
