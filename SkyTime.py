@@ -58,8 +58,10 @@ class SkyTime():
 
         # Initializes pygame and the screen Surface object
         pygame.init()
-        self.windowSurfaceObj = pygame.display.set_mode(
-            (width, height))
+        pygame.display.set_mode((width, height))
+        self.windowSurfaceObj = pygame.display.get_surface()
+        #self.windowSurfaceObj = pygame.display.set_mode(
+            #(width, height))
 
         # The angles for the clock hands
         self.angles = [0, -30, -60, -90, -120, -150, -180,
@@ -80,8 +82,6 @@ class SkyTime():
         self.howToPlay = pygame.font.Font('freesansbold.ttf', 65)
         self.enterButton = pygame.font.Font('freesansbold.ttf', 20)
         self.shiftButton = pygame.font.Font('freesansbold.ttf', 16)
-
-        self.main_game_loop()
 
     # Generates a random goal time with minutes of increment distance
     def set_time(self, distance):
@@ -688,7 +688,7 @@ class SkyTime():
         self.windowSurfaceObj.blit(
             badge_image, (render_left - (iw / 2), render_top + (ih / 2)))
 
-    def main_game_loop(self):
+    def run(self):
 
         # Generates a new random time
         self.hour = randint(1, 12)
@@ -1189,5 +1189,11 @@ class SkyTime():
             if self.gameloop:
                 pygame.display.update()
 
+
+# Called after running ./SkyTime.py in the command line
+def main():
+    game = SkyTime()
+    game.run()
+
 if __name__ == "__main__":
-    SkyTime()
+    main()

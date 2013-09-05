@@ -1,4 +1,4 @@
-    #!/usr/bin/env python
+#!/usr/bin/env python
 
 from gettext import gettext as _
 
@@ -36,7 +36,7 @@ class SkyTimeActivity(sugar3.activity.activity.Activity):
         self.set_canvas(self.canvas)
         self.canvas.grab_focus()
 
-        self.canvas.run_pygame(self.game.run)
+        self.canvas.run_pygame(self.run)
 
     def build_toolbar(self):
 
