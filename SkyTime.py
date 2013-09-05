@@ -56,13 +56,6 @@ class SkyTime():
 
         self.badges = badges("SkyTime", bundle_id)
 
-        # Initializes pygame and the screen Surface object
-        pygame.init()
-        pygame.display.set_mode((width, height))
-        self.windowSurfaceObj = pygame.display.get_surface()
-        #self.windowSurfaceObj = pygame.display.set_mode(
-            #(width, height))
-
         # The angles for the clock hands
         self.angles = [0, -30, -60, -90, -120, -150, -180,
                        -210, -240, -270, -300, -330]
@@ -690,6 +683,9 @@ class SkyTime():
 
     def run(self):
 
+        # Initializes pygame and the screen Surface object
+        self.windowSurfaceObj = pygame.display.get_surface()
+
         # Generates a new random time
         self.hour = randint(1, 12)
         self.minute = self.random_minute(self.increment)
@@ -1192,6 +1188,8 @@ class SkyTime():
 
 # Called after running ./SkyTime.py in the command line
 def main():
+    pygame.init()
+    pygame.display.set_mode((width, height))
     game = SkyTime()
     game.run()
 
