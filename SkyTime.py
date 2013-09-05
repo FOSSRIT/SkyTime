@@ -15,8 +15,6 @@ from constants import width, height, clock_render_left, clock_render_top, \
     goal_time_render_top, CLOCK_REWARDS, REWARDS_DICT, BACKGROUND_REWARDS, \
     MENU_OPTIONS, REWARD_OPTIONS
 
-from gi.repository import Gtk
-
 
 class SkyTime():
 
@@ -707,9 +705,6 @@ class SkyTime():
 
         # Loop the game until the player quits
         while self.gameloop:
-
-            while Gtk.events_pending():
-                Gtk.main_interation()
 
             self.drawScreen()
             self.update_screen = False

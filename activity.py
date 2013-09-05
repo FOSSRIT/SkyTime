@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+from gettext import gettext as _
+
 import sys
 from gi.repository import Gtk
-import pygame
 
 from sugar3.activity.activity import Activity
 from sugar3.graphics.toolbarbox import ToolbarBox
@@ -69,3 +70,15 @@ class SkyTimeActivity(Activity):
         toolbar_box.toolbar.insert(stop_button, -1)
         stop_button.show()
 
+    def stop_play_cb(self, button):
+        # Pause or unpause the game
+        self.paused = not self.paused
+        self.game.set_paused(self.paused)
+
+        # Update the button to show the next action
+        if self.paused:
+            button.set_icon('media-playback-start')
+            button.set_tooltip(_("Start"))
+        else:
+            button.set_icon('media-playback-stop')
+            button.set_tooltip(_("Stop"))
