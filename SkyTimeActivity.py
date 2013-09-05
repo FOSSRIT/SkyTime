@@ -36,7 +36,7 @@ class SkyTimeActivity(sugar3.activity.activity.Activity):
         self.set_canvas(self.canvas)
         self.canvas.grab_focus()
 
-        self.canvas.run_pygame(self.run)
+        self.canvas.run_pygame(self.game.run)
 
     def build_toolbar(self):
 
