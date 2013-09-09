@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import pygame
+from gi.repository import Gtk
 import gettext
 import os
 
@@ -9,6 +10,7 @@ from pygame import transform
 from badges import badges
 from pygame.locals import K_1, K_2, K_3, K_4, K_ESCAPE, K_RETURN,\
     K_LSHIFT, K_RSHIFT, K_BACKSPACE, QUIT, KEYDOWN, K_LEFT, K_RIGHT
+
 from constants import width, height, clock_render_left, clock_render_top, \
     box_render_left, time_render_left, your_time_render_top, HANDS, \
     goal_time_render_top, CLOCK_REWARDS, REWARDS_DICT, BACKGROUND_REWARDS, \
@@ -17,7 +19,7 @@ from constants import width, height, clock_render_left, clock_render_top, \
 
 class SkyTime():
 
-    def __init__(self):
+    def __init__(self, bundle_id="org.laptop.SkyTime"):
 
         # Declaring Variables
         self.hour = 12
@@ -53,18 +55,14 @@ class SkyTime():
         self.box_style = 'default'
         self.time_box_style = 'white'
 
-        self.badges = badges("SkyTime", "org.laptop.SkyTime")
-
-        # Initializes pygame and the screen Surface object
-        pygame.init()
-        self.windowSurfaceObj = pygame.display.set_mode(
-            (width, height))
+        self.badges = badges("SkyTime", bundle_id)
 
         # The angles for the clock hands
         self.angles = [0, -30, -60, -90, -120, -150, -180,
                        -210, -240, -270, -300, -330]
 
         # Loads all of the assets
+        pygame.font.init()
         self.howToScreen = pygame.image.load('images/HowToScreen.gif')
         self.clockCenter = pygame.image.load('images/clock_center/default.png')
         self.languages = pygame.image.load('images/language.png')
@@ -79,8 +77,6 @@ class SkyTime():
         self.howToPlay = pygame.font.Font('freesansbold.ttf', 65)
         self.enterButton = pygame.font.Font('freesansbold.ttf', 20)
         self.shiftButton = pygame.font.Font('freesansbold.ttf', 16)
-
-        self.main_game_loop()
 
     # Generates a random goal time with minutes of increment distance
     def set_time(self, distance):
@@ -687,7 +683,30 @@ class SkyTime():
         self.windowSurfaceObj.blit(
             badge_image, (render_left - (iw / 2), render_top + (ih / 2)))
 
-    def main_game_loop(self):
+    def save_game(self):
+
+        path = os.path.join(
+            os.path.split(__file__)[0], 'saved.txt')
+        with open(path, mode='w') as saved_game:
+            for clock_reward in REWARDS_DICT['clock'].values():
+                if clock_reward['earned']:
+                    saved_game.write(
+                        'clock:' + clock_reward['name'] + '\n')
+            for bg_reward in REWARDS_DICT[
+                    'background'].values():
+                if bg_reward['earned']:
+                    saved_game.write(
+                        'background:' + bg_reward[
+                            'name'] + '\n')
+            saved_game.write(
+                'score:' + str(self.sun_count) + '\n')
+            saved_game.write(
+                'career:' + str(self.career_suns))
+
+    def run(self):
+
+        # Initializes pygame and the screen Surface object
+        self.windowSurfaceObj = pygame.display.get_surface()
 
         # Generates a new random time
         self.hour = randint(1, 12)
@@ -705,6 +724,9 @@ class SkyTime():
         # Loop the game until the player quits
         while self.gameloop:
 
+            while Gtk.events_pending():
+                Gtk.main_iteration()
+
             self.drawScreen()
             self.update_screen = False
             self.update_hands = False
@@ -714,7 +736,7 @@ class SkyTime():
                 self.display_badge += 1
                 self.displayBadge(self.badge_awarded)
 
-                if self.display_badge > 200:
+                if self.display_badge > 100:
                     self.badge_awarded = None
                     self.update_screen = True
                     self.update_hands = True
@@ -727,9 +749,10 @@ class SkyTime():
                 if self.play_victory:
                     pygame.mixer.music.load('sounds/jenn-yay.wav')
                     pygame.mixer.music.play()
+                    self.save_game()
                     self.play_victory = False
 
-                if self.waited > 200:
+                if self.waited > 100:
 
                     # Generates a new random time
                     self.hour = randint(1, 12)
@@ -902,6 +925,7 @@ class SkyTime():
                                     reward['earned'] = True
                                     self.clock_style = CLOCK_REWARDS[
                                         self.reward_selected]
+                                    self.save_game()
                                     self.update_screen = True
 
                                 # Award badges
@@ -953,7 +977,7 @@ class SkyTime():
                                         self.reward_selected]
                                     self.text_color = REWARDS_DICT[
                                         'background'][self.background_style][
-                                            'color']
+                                        'color']
                                     self.update_screen = True
 
                                 # Check if the user has enough for the reward
@@ -967,7 +991,8 @@ class SkyTime():
                                         self.reward_selected]
                                     self.text_color = REWARDS_DICT[
                                         'background'][self.background_style][
-                                            'color']
+                                        'color']
+                                    self.save_game()
                                     self.update_screen = True
 
                                 # Award badges
@@ -1188,5 +1213,13 @@ class SkyTime():
             if self.gameloop:
                 pygame.display.update()
 
+
+# Called after running ./SkyTime.py in the command line
+def main():
+    pygame.init()
+    pygame.display.set_mode((width, height))
+    game = SkyTime()
+    game.run()
+
 if __name__ == "__main__":
-    SkyTime()
+    main()

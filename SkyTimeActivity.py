@@ -1,4 +1,4 @@
-    #!/usr/bin/env python
+#!/usr/bin/env python
 
 from gettext import gettext as _
 

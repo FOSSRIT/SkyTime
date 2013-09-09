@@ -1,5 +1,5 @@
 width = 1200
-height = 875
+height = 850
 
 clock_render_left = width * .015
 clock_render_top = height * .01
