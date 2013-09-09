@@ -683,6 +683,26 @@ class SkyTime():
         self.windowSurfaceObj.blit(
             badge_image, (render_left - (iw / 2), render_top + (ih / 2)))
 
+    def save_game(self):
+
+        path = os.path.join(
+            os.path.split(__file__)[0], 'saved.txt')
+        with open(path, mode='w') as saved_game:
+            for clock_reward in REWARDS_DICT['clock'].values():
+                if clock_reward['earned']:
+                    saved_game.write(
+                        'clock:' + clock_reward['name'] + '\n')
+            for bg_reward in REWARDS_DICT[
+                    'background'].values():
+                if bg_reward['earned']:
+                    saved_game.write(
+                        'background:' + bg_reward[
+                            'name'] + '\n')
+            saved_game.write(
+                'score:' + str(self.sun_count) + '\n')
+            saved_game.write(
+                'career:' + str(self.career_suns))
+
     def run(self):
 
         # Initializes pygame and the screen Surface object
@@ -716,7 +736,7 @@ class SkyTime():
                 self.display_badge += 1
                 self.displayBadge(self.badge_awarded)
 
-                if self.display_badge > 200:
+                if self.display_badge > 100:
                     self.badge_awarded = None
                     self.update_screen = True
                     self.update_hands = True
@@ -729,9 +749,10 @@ class SkyTime():
                 if self.play_victory:
                     pygame.mixer.music.load('sounds/jenn-yay.wav')
                     pygame.mixer.music.play()
+                    self.save_game()
                     self.play_victory = False
 
-                if self.waited > 200:
+                if self.waited > 100:
 
                     # Generates a new random time
                     self.hour = randint(1, 12)
@@ -904,6 +925,7 @@ class SkyTime():
                                     reward['earned'] = True
                                     self.clock_style = CLOCK_REWARDS[
                                         self.reward_selected]
+                                    self.save_game()
                                     self.update_screen = True
 
                                 # Award badges
@@ -970,6 +992,7 @@ class SkyTime():
                                     self.text_color = REWARDS_DICT[
                                         'background'][self.background_style][
                                         'color']
+                                    self.save_game()
                                     self.update_screen = True
 
                                 # Award badges
