@@ -1,7 +1,7 @@
 [Activity]
 name = SkyTime
 bundle_id = org.laptop.SkyTime
-exec = sugar-activity activity.SkyTimeActivity
+exec = sugar-activity SkyTimeActivity.SkyTimeActivity
 icon = skytime
 activity_version = 2
 show_launcher = yes

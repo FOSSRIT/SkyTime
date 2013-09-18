@@ -1,5 +1,5 @@
 width = 1200
-height = 875
+height = 850
 
 clock_render_left = width * .015
 clock_render_top = height * .01
@@ -8,6 +8,122 @@ box_render_left = width * .55
 time_render_left = box_render_left + (width * .185)
 your_time_render_top = height * .05
 goal_time_render_top = height * .285
+
+REWARD_OPTIONS = ['Clock Faces', 'Backgrounds']
+
+MENU_OPTIONS = ['Play', 'Challenge', 'How To Play', 'Rewards']
+
+CLOCK_REWARDS = ['default', 'green', 'moon', 'purple',
+                 'watermelon', 'spikeysun', 'earth', 'bluemoon']
+
+BACKGROUND_REWARDS = ['default', 'night-cloudy', 'night-clear',
+                      'rainbow', 'sunset', 'rain', 'galaxy', 'northern-lights']
+
+REWARDS_DICT = {
+    'clock': {
+        'default': {
+            'name': 'default',
+            'earned': True,
+            'value': '0',
+            'color': (0, 0, 0)
+        },
+        'green': {
+            'name': 'green',
+            'earned': False,
+            'value': '15',
+            'color': (0, 0, 0)
+        },
+        'moon': {
+            'name': 'moon',
+            'earned': False,
+            'value': '30',
+            'color': (0, 0, 0)
+        },
+        'purple': {
+            'name': 'purple',
+            'earned': False,
+            'value': '75',
+            'color': (0, 0, 0)
+        },
+        'watermelon': {
+            'name': 'watermelon',
+            'earned': False,
+            'value': '120',
+            'color': (0, 0, 0)
+        },
+        'spikeysun': {
+            'name': 'spikeysun',
+            'earned': False,
+            'value': '175',
+            'color': (0, 0, 0)
+        },
+        'bluemoon': {
+            'name': 'bluemoon',
+            'earned': False,
+            'value': '300',
+            'color': (0, 0, 0)
+        },
+        'earth': {
+            'name': 'earth',
+            'earned': False,
+            'value': '225',
+            'color': (0, 0, 0)
+        }
+    },
+    'background': {
+        'default': {
+            'name': 'default',
+            'earned': True,
+            'value': '0',
+            'color': (0, 0, 0)
+        },
+        'night-cloudy': {
+            'name': 'night-cloudy',
+            'earned': False,
+            'value': '15',
+            'color': (255, 255, 255)
+        },
+        'night-clear': {
+            'name': 'night-clear',
+            'earned': False,
+            'value': '30',
+            'color': (255, 255, 255)
+        },
+        'rainbow': {
+            'name': 'rainbow',
+            'earned': False,
+            'value': '75',
+            'color': (0, 0, 0)
+        },
+        'sunset': {
+            'name': 'sunset',
+            'earned': False,
+            'value': '125',
+            'color': (0, 0, 0)
+        },
+        'rain': {
+            'name': 'rain',
+            'earned': False,
+            'value': '175',
+            'color': (0, 0, 0)
+        },
+        'northern-lights': {
+            'name': 'northern-lights',
+            'earned': False,
+            'value': '300',
+            'color': (255, 255, 255)
+        },
+        'galaxy': {
+            'name': 'galaxy',
+            'earned': False,
+            'value': '225',
+            'color': (255, 255, 255)
+        }
+    },
+    'score': '0',
+    'number_clocks': 0,
+    'number_backgrounds': 0
+}
 
 HANDS = {
     'minute': {
