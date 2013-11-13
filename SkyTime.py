@@ -6,7 +6,8 @@ import gettext
 import os
 
 from random import randint
-from pygame import transform
+from pygame import transform, mouse
+from button import Button
 from badges import badges
 from pygame.locals import K_1, K_2, K_3, K_4, K_ESCAPE, K_RETURN,\
     K_LSHIFT, K_RSHIFT, K_BACKSPACE, QUIT, KEYDOWN, K_LEFT, K_RIGHT
@@ -20,6 +21,8 @@ from constants import width, height, clock_render_left, clock_render_top, \
 class SkyTime():
 
     def __init__(self, bundle_id="org.laptop.SkyTime"):
+
+        self.button = Button(0, 0, 100, 100)
 
         # Declaring Variables
         self.hour = 12
@@ -730,6 +733,9 @@ class SkyTime():
             self.drawScreen()
             self.update_screen = False
             self.update_hands = False
+
+            #print(mouse.get_pressed()[0] == 1)
+            print(self.button.isClicked(mouse.get_pos()[0], mouse.get_pos()[1], mouse.get_pressed()[0]))
 
             # Create a timer for displaying a badge recently earned
             if self.badge_awarded is not None and self.playing:
