@@ -1,9 +1,12 @@
 class Button:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, minute, hour):
         self.x = x
         self.y = y
+        self.minute = minute
+        self.hour = hour
         self.width = width
         self.height = height
+        self.images = []
 
     def isClicked(self, x, y, click):
         if 0 <= x-self.x <= self.width and \

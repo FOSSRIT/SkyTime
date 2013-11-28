@@ -15,14 +15,12 @@ from pygame.locals import K_1, K_2, K_3, K_4, K_ESCAPE, K_RETURN,\
 from constants import width, height, clock_render_left, clock_render_top, \
     box_render_left, time_render_left, your_time_render_top, HANDS, \
     goal_time_render_top, CLOCK_REWARDS, REWARDS_DICT, BACKGROUND_REWARDS, \
-    MENU_OPTIONS, REWARD_OPTIONS
+    MENU_OPTIONS, REWARD_OPTIONS, NUMBERS
 
 
 class SkyTime():
 
     def __init__(self, bundle_id="org.laptop.SkyTime"):
-
-        self.button = Button(0, 0, 100, 100)
 
         # Declaring Variables
         self.hour = 12
@@ -63,6 +61,8 @@ class SkyTime():
         # The angles for the clock hands
         self.angles = [0, -30, -60, -90, -120, -150, -180,
                        -210, -240, -270, -300, -330]
+        self.numbers = []
+        self.buttons = []
 
         # Loads all of the assets
         pygame.font.init()
@@ -81,6 +81,16 @@ class SkyTime():
         self.enterButton = pygame.font.Font('freesansbold.ttf', 20)
         self.shiftButton = pygame.font.Font('freesansbold.ttf', 16)
 
+        # Load the number images
+        for i in range(0, 12):
+            image = pygame.image.load('images/numbers/{}.png'.format(i))
+            iw, ih = image.get_size()
+            self.numbers.append(image)
+            self.buttons.append(Button(
+                NUMBERS[i]['render_left'],
+                NUMBERS[i]['render_top'],
+                iw, ih, i * 5, i))
+
     # Generates a random goal time with minutes of increment distance
     def set_time(self, distance):
         goal = str(randint(1, 12)) + ':'
@@ -91,7 +101,7 @@ class SkyTime():
         goal += str(gmin)
         return goal
 
-    # Generates a random minute
+        # Generates a random minutr
     def random_minute(self, distance):
         return (randint(0, 60) * distance) % 60
 
@@ -598,6 +608,13 @@ class SkyTime():
                 self.windowSurfaceObj.blit(
                     clock, (clock_render_left, clock_render_top))
 
+                # Draw the clock numbers
+                for i in range(0, 12):
+                    self.windowSurfaceObj.blit(
+                        self.numbers[i],
+                        (NUMBERS[i]['render_left'],
+                         NUMBERS[i]['render_top']))
+
                 # Draw the clock hands
                 self.windowSurfaceObj.blit(
                     HANDS['minute'][self.minute]['image'],
@@ -734,8 +751,11 @@ class SkyTime():
             self.update_screen = False
             self.update_hands = False
 
-            #print(mouse.get_pressed()[0] == 1)
-            print(self.button.isClicked(mouse.get_pos()[0], mouse.get_pos()[1], mouse.get_pressed()[0]))
+            for i in range(0, 12):
+                if self.buttons[i].isClicked(mouse.get_pos()[0],
+                                             mouse.get_pos()[1],
+                                             mouse.get_pressed()[0]):
+                    print("pressed button {}".format(i))
 
             # Create a timer for displaying a badge recently earned
             if self.badge_awarded is not None and self.playing:

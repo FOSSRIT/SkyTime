@@ -144,7 +144,7 @@ HANDS = {
         },
         15: {
             'image': None,
-            'render_left': clock_render_left + (width * .25),
+            'render_left': clock_render_left + (width * .24),
             'render_top': clock_render_top + (height * .31)
         },
         20: {
@@ -249,5 +249,56 @@ HANDS = {
             'render_left': clock_render_left + (width * .18),
             'render_top': clock_render_top + (height * .2)
         }
+    }
+}
+
+NUMBERS = {
+    0: {
+        'render_left': width * .235,
+        'render_top': height * .06
+    },
+    1: {
+        'render_left': width * .325,
+        'render_top': height * .1
+    },
+    2: {
+        'render_left': width * .38,
+        'render_top': height * .19
+    },
+    3: {
+        'render_left': width * .41,
+        'render_top': height * .31
+    },
+    4: {
+        'render_left': width * .385,
+        'render_top': height * .44
+    },
+    5: {
+        'render_left': width * .325,
+        'render_top': height * .53
+    },
+    6: {
+        'render_left': width * .235,
+        'render_top': height * .57
+    },
+    7: {
+        'render_left': width * .14,
+        'render_top': height * .53
+    },
+    8: {
+        'render_left': width * .075,
+        'render_top': height * .44
+    },
+    9: {
+        'render_left': width * .05,
+        'render_top': height * .31
+    },
+    10: {
+        'render_left': width * .075,
+        'render_top': height * .19
+    },
+    11: {
+        'render_left': width * .14,
+        'render_top': height * .1
     }
 }
