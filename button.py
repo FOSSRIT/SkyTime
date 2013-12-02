@@ -8,8 +8,9 @@ class Button:
         self.height = height
         self.images = []
 
-    def isClicked(self, x, y, click):
+    def click(self, x, y, click):
         if 0 <= x-self.x <= self.width and \
-           0 <= y-self.y <= self.height and click:
+           0 <= y-self.y <= self.height and \
+           click and not self.clicked:
             return True
         return False

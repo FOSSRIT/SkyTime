@@ -101,10 +101,11 @@ class SkyTime():
         goal += str(gmin)
         return goal
 
-        # Generates a random minutr
+    # Generates a random minute
     def random_minute(self, distance):
         return (randint(0, 60) * distance) % 60
 
+    # Draws the current game screen
     def drawScreen(self):
 
         # Only updates the player's screen if needed
@@ -137,6 +138,7 @@ class SkyTime():
                     str(self.sun_count), False, self.text_color),
                     (width * .73, height * .575))
 
+                # Check if the current mode is the challenge
                 if self.mode == 'challenge':
                     # Displays your goal time
                     self.windowSurfaceObj.blit(
@@ -150,9 +152,7 @@ class SkyTime():
                     self.windowSurfaceObj.blit(self.fontObj.render(
                         self._('Goal Time'), False, self.text_color),
                         (box_render_left, goal_time_render_top))
-
                 else:
-
                     # Displays your goal time
                     self.windowSurfaceObj.blit(
                         time_box,
@@ -233,6 +233,7 @@ class SkyTime():
             # Draw the loading screen
             elif self.mode == 'loading':
 
+                # Load in the background for the screen
                 screen = pygame.image.load(
                     'images/background/{}.png'.format(self.background_style))
                 screen = transform.scale(screen, (width, height))
@@ -751,12 +752,6 @@ class SkyTime():
             self.update_screen = False
             self.update_hands = False
 
-            for i in range(0, 12):
-                if self.buttons[i].isClicked(mouse.get_pos()[0],
-                                             mouse.get_pos()[1],
-                                             mouse.get_pressed()[0]):
-                    print("pressed button {}".format(i))
-
             # Create a timer for displaying a badge recently earned
             if self.badge_awarded is not None and self.playing:
                 self.display_badge += 1
@@ -804,6 +799,14 @@ class SkyTime():
                         self.mode = 'play'
                     else:
                         self.mode = 'challenge'
+
+            # Check if the user is playing and if a number was clicked
+            if self.playing:
+                for i in range(0, 12):
+                    if self.buttons[i].click(mouse.get_pos()[0],
+                                             mouse.get_pos()[1],
+                                             mouse.get_pressed()[0]):
+                        print("pressed button {}".format(i))
 
             # Check if the player wants to quit the game
             for event in pygame.event.get():
@@ -1120,7 +1123,6 @@ class SkyTime():
 
                     # Check if the user is playing the game
                     if self.playing:
-
                         # Increments the hour by 1
                         if event.key == K_LSHIFT:
                             self.hour += 1
