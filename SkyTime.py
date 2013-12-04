@@ -63,6 +63,7 @@ class SkyTime():
                        -210, -240, -270, -300, -330]
         self.numbers = []
         self.buttons = []
+        self.handHitBox = []
 
         # Loads all of the assets
         pygame.font.init()
@@ -610,22 +611,28 @@ class SkyTime():
                     clock, (clock_render_left, clock_render_top))
 
                 # Draw the clock numbers
-                for i in range(0, 12):
-                    self.windowSurfaceObj.blit(
-                        self.numbers[i],
-                        (NUMBERS[i]['render_left'],
-                         NUMBERS[i]['render_top']))
+                #for i in range(0, 12):
+                #    self.windowSurfaceObj.blit(
+                #        self.numbers[i],
+                #        (NUMBERS[i]['render_left'],
+                #         NUMBERS[i]['render_top']))
 
                 # Draw the clock hands
-                self.windowSurfaceObj.blit(
-                    HANDS['minute'][self.minute]['image'],
-                    (HANDS['minute'][self.minute]['render_left'],
-                     HANDS['minute'][self.minute]['render_top']))
+                minuteHand = HANDS['minute'][self.minute]['image']
+                x = HANDS['minute'][self.minute]['render_left']
+                y = HANDS['minute'][self.minute]['render_top']
+                self.windowSurfaceObj.blit(minuteHand, (x, y))
+                iw, ih = minuteHand.get_size()
+                minuteHitBox = Button(x, y, iw, ih)
 
-                self.windowSurfaceObj.blit(
-                    HANDS['hour'][self.hour]['image'],
-                    (HANDS['hour'][self.hour]['render_left'],
-                     HANDS['hour'][self.hour]['render_top']))
+                hourHand = HANDS['hour'][self.hour]['image']
+                x = HANDS['hour'][self.hour]['render_left']
+                y = HANDS['hour'][self.hour]['render_top']
+                self.windowSurfaceObj.blit(hourHand, (x, y))
+                iw, ih = hourHand.get_size()
+                hourHitBox = Button(x, y, iw, ih)
+
+                self.handHitBox = [hourHitBox, minuteHitBox]
 
                 # Draw the clock center
                 screen = transform.scale(
@@ -802,11 +809,17 @@ class SkyTime():
 
             # Check if the user is playing and if a number was clicked
             if self.playing:
-                for i in range(0, 12):
-                    if self.buttons[i].click(mouse.get_pos()[0],
-                                             mouse.get_pos()[1],
-                                             mouse.get_pressed()[0]):
-                        print("pressed button {}".format(i))
+                for i in range(0, 2):
+                    if self.handHitBox[i].click(mouse.get_pos()[0],
+                                                mouse.get_pos()[1],
+                                                mouse.get_pressed()[0]):
+                        print("pressed hand {}".format(i))
+                        break
+                #for i in range(0, 12):
+                #    if self.buttons[i].click(mouse.get_pos()[0],
+                #                             mouse.get_pos()[1],
+                #                             mouse.get_pressed()[0]):
+                #        print("pressed button {}".format(i))
 
             # Check if the player wants to quit the game
             for event in pygame.event.get():
