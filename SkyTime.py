@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 
-import pygame
 from gi.repository import Gtk
+import pygame
 import gettext
 import os
 
 from random import randint
 from pygame import transform
 from badges import badges
-from pygame.locals import K_1, K_2, K_3, K_4, K_ESCAPE, K_RETURN,\
+from pygame.locals import K_1, K_2, K_3, K_4, K_5, K_ESCAPE, K_RETURN,\
     K_LSHIFT, K_RSHIFT, K_BACKSPACE, QUIT, KEYDOWN, K_LEFT, K_RIGHT
 
 from constants import width, height, clock_render_left, clock_render_top, \
-    box_render_left, time_render_left, your_time_render_top, HANDS, \
-    goal_time_render_top, CLOCK_REWARDS, REWARDS_DICT, BACKGROUND_REWARDS, \
-    MENU_OPTIONS, REWARD_OPTIONS
+    box_render_left, time_render_left, jargon_render_left, jargon_render_top, \
+    your_time_render_top, HANDS, goal_time_render_top, CLOCK_REWARDS, \
+    REWARDS_DICT, BACKGROUND_REWARDS, MENU_OPTIONS, REWARD_OPTIONS, JARGON
 
 
 class SkyTime():
@@ -26,6 +26,8 @@ class SkyTime():
         self.minute = 0
         self.time = ''
         self.goal_time = ''
+        self.goal_minute = 0
+        self.goal_hour = 0
         self.playing = False
         self.winner = False
         self.gameloop = True
@@ -46,6 +48,7 @@ class SkyTime():
         self.badge_awarded = None
         self.incorrect_count = 0
         self.text_color = (0, 0, 0)
+        self.jargon_index = None
 
         self.hour_style = 'default'
         self.minute_style = 'default'
@@ -80,9 +83,12 @@ class SkyTime():
 
     # Generates a random goal time with minutes of increment distance
     def set_time(self, distance):
-        goal = str(randint(1, 12)) + ':'
+        self.goal_hour = randint(1, 12)
+        goal = str(self.goal_hour) + ':'
         gmin = randint(0, 60) * distance
         gmin = gmin % 60
+        self.goal_minute = gmin
+        self.jargon_index = None
         if gmin < 10:
             goal += '0'
         goal += str(gmin)
@@ -97,7 +103,7 @@ class SkyTime():
         # Only updates the player's screen if needed
         if self.update_screen:
 
-            # Display the actual game screens (play and challenge)
+            # Display the actual game screens (play, challenge, jargon)
             if self.playing:
 
                 # Set the background
@@ -124,23 +130,20 @@ class SkyTime():
                     str(self.sun_count), False, self.text_color),
                     (width * .73, height * .575))
 
-                if self.mode == 'challenge':
-                    # Displays your goal time
-                    self.windowSurfaceObj.blit(
-                        time_box,
-                        (box_render_left,
-                         goal_time_render_top + (height * .045)))
-                    self.windowSurfaceObj.blit(self.fontObj.render(
-                        self.goal_time, False, pygame.Color(0, 0, 0)),
-                        (time_render_left,
-                         goal_time_render_top + (height * .09)))
-                    self.windowSurfaceObj.blit(self.fontObj.render(
-                        self._('Goal Time'), False, self.text_color),
-                        (box_render_left, goal_time_render_top))
-
+                # Display the jargon phrase
+                if self.mode == 'jargon':
+                    jargon = JARGON[self.goal_hour][self.goal_minute]
+                    if self.jargon_index is None:
+                        self.jargon_index = randint(0, len(jargon) - 1)
+                    phrase = jargon[self.jargon_index]
+                    text = self.fontObj.render(
+                        str(phrase), False, self.text_color)
+                    fw, fh = text.get_size()
+                    self.windowSurfaceObj.blit(text,
+                                               (jargon_render_left,
+                                                jargon_render_top))
+                # Displays your goal time
                 else:
-
-                    # Displays your goal time
                     self.windowSurfaceObj.blit(
                         time_box,
                         (box_render_left,
@@ -776,6 +779,8 @@ class SkyTime():
 
                     if self.prev_mode == 'play':
                         self.mode = 'play'
+                    elif self.prev_mode == 'jargon':
+                        self.mode = 'jargon'
                     else:
                         self.mode = 'challenge'
 
@@ -1075,6 +1080,14 @@ class SkyTime():
                             self.update_screen = True
                             self.update_hands = False
                             self.playing = False
+
+                        # Draw the jargon screen
+                        elif event.key == K_5:
+                            self.mode = 'jargon'
+                            self.update_screen = True
+                            self.update_hands = True
+                            self.loadHands()
+                            self.playing = True
 
                         # Go back to language select
                         elif event.key == K_BACKSPACE:
