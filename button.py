@@ -7,9 +7,16 @@ class Button:
         self.width = width
         self.height = height
         self.images = []
+        self.prevPressed = False
 
-    def click(self, x, y, click):
+    def pressed(self, x, y, curState):
+        if (0 <= x-self.x <= self.width and
+           0 <= y-self.y <= self.height and curState) or curState:
+            return True
+        return False
+
+    def intersects(self, x, y):
         if 0 <= x-self.x <= self.width and \
-           0 <= y-self.y <= self.height and click:
+           0 <= y-self.y <= self.height:
             return True
         return False

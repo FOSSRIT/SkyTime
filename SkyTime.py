@@ -33,6 +33,10 @@ class SkyTime():
         self.update_hands = False
         self.update_screen = True
         self.play_victory = False
+        self.curMouseState = None
+        self.prevMouseState = None
+        self.mouseX = None
+        self.mouseY = None
         self.clock_rewards = []
         self.background_rewards = []
         self.increment = 5
@@ -91,6 +95,12 @@ class SkyTime():
                 NUMBERS[i]['render_left'],
                 NUMBERS[i]['render_top'],
                 iw, ih, i * 5, i))
+
+        image = pygame.image.load('images/box/white.png')
+        box = transform.scale(image, (50, 50))
+        self.buttonHitBoxImage = [box]
+        hitBox = Button(width * .31, height * .2, 50, 50, 5, 1)
+        self.numberHitBox = [hitBox]
 
     # Generates a random goal time with minutes of increment distance
     def set_time(self, distance):
@@ -634,6 +644,10 @@ class SkyTime():
 
                 self.handHitBox = [hourHitBox, minuteHitBox]
 
+                # Draw the number hit box
+                self.windowSurfaceObj.blit(self.buttonHitBoxImage[0],
+                                           (width * .31, height * .2))
+
                 # Draw the clock center
                 screen = transform.scale(
                     self.clockCenter, (width/22, height/18))
@@ -752,6 +766,14 @@ class SkyTime():
         # Loop the game until the player quits
         while self.gameloop:
 
+            # Update the mouse's state
+            self.prevMouseState = self.curMouseState
+            self.curMouseState = mouse.get_pressed()[0]
+
+            # Update the mouse's position
+            self.mouseX = mouse.get_pos()[0]
+            self.mouseY = mouse.get_pos()[1]
+
             while Gtk.events_pending():
                 Gtk.main_iteration()
 
@@ -809,16 +831,29 @@ class SkyTime():
 
             # Check if the user is playing and if a number was clicked
             if self.playing:
-                for i in range(0, 2):
-                    if self.handHitBox[i].click(mouse.get_pos()[0],
-                                                mouse.get_pos()[1],
-                                                mouse.get_pressed()[0]):
-                        print("pressed hand {}".format(i))
-                        break
+                for i in range(1, 2):
+                    buttonPressed = self.handHitBox[i].pressed(
+                        self.mouseX, self.mouseY, self.curMouseState)
+                    if buttonPressed:
+                        print("pressed")
+                        if self.numberHitBox[0].intersects(self.mouseX,
+                                                           self.mouseY):
+                            print("intersets")
+                            if i == 0:
+                                self.hour = self.numberHitBox[0].hour
+                                self.update_hands = True
+                                break
+                            else:
+                                self.minute = self.numberHitBox[0].minute
+                                self.update_hands = True
+                                break
+                        else:
+                            print("no intersets")
+                    else:
+                        print("no press")
                 #for i in range(0, 12):
-                #    if self.buttons[i].click(mouse.get_pos()[0],
-                #                             mouse.get_pos()[1],
-                #                             mouse.get_pressed()[0]):
+                #    if self.buttons[i].click(
+                #            self.mouseX, self.mouseY, self.curMouseState):
                 #        print("pressed button {}".format(i))
 
             # Check if the player wants to quit the game
