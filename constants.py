@@ -303,6 +303,61 @@ NUMBERS = {
     }
 }
 
+NUMBERS_HIT_BOX = {
+    0: {
+        'render_left': width * .245,
+        'render_top': height * .165,
+        'width': 50,
+        'height': 100
+    },
+    1: {
+        'render_left': width * .31,
+        'render_top': height * .2,
+        'width': 50,
+        'height': 100
+    },
+    2: {
+        'render_left': width * .38,
+        'render_top': height * .19
+    },
+    3: {
+        'render_left': width * .41,
+        'render_top': height * .31
+    },
+    4: {
+        'render_left': width * .385,
+        'render_top': height * .44
+    },
+    5: {
+        'render_left': width * .325,
+        'render_top': height * .53
+    },
+    6: {
+        'render_left': width * .235,
+        'render_top': height * .57
+    },
+    7: {
+        'render_left': width * .14,
+        'render_top': height * .53
+    },
+    8: {
+        'render_left': width * .075,
+        'render_top': height * .44
+    },
+    9: {
+        'render_left': width * .05,
+        'render_top': height * .31
+    },
+    10: {
+        'render_left': width * .075,
+        'render_top': height * .19
+    },
+    11: {
+        'render_left': width * .14,
+        'render_top': height * .1
+    }
+}
+
 JARGON = {
     '0': {
         '0': ['Twelve o\' clock', 'Noon', 'Midnight'],

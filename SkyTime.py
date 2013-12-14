@@ -15,7 +15,7 @@ from pygame.locals import K_1, K_2, K_3, K_4, K_ESCAPE, K_RETURN,\
 from constants import width, height, clock_render_left, clock_render_top, \
     box_render_left, time_render_left, your_time_render_top, HANDS, \
     goal_time_render_top, CLOCK_REWARDS, REWARDS_DICT, BACKGROUND_REWARDS, \
-    MENU_OPTIONS, REWARD_OPTIONS, NUMBERS
+    MENU_OPTIONS, REWARD_OPTIONS, NUMBERS, NUMBERS_HIT_BOX
 
 
 class SkyTime():
@@ -97,10 +97,19 @@ class SkyTime():
                 iw, ih, i * 5, i))
 
         image = pygame.image.load('images/box/white.png')
-        box = transform.scale(image, (50, 50))
-        self.buttonHitBoxImage = [box]
-        hitBox = Button(width * .31, height * .2, 50, 50, 5, 1)
-        self.numberHitBox = [hitBox]
+
+        # Load the number hit boxes
+        self.numberHitBox = []
+        for i in range(0, 2):
+            boxWidth = NUMBERS_HIT_BOX[i]['width']
+            boxHeight = NUMBERS_HIT_BOX[i]['height']
+            hitBox = Button(
+                NUMBERS_HIT_BOX[i]['render_left'],
+                NUMBERS_HIT_BOX[i]['render_top'],
+                boxWidth, boxHeight, i * 5, i)
+            box = transform.scale(image, (boxWidth, boxHeight))
+            hitBox.image = box
+            self.numberHitBox.append(hitBox)
 
     # Generates a random goal time with minutes of increment distance
     def set_time(self, distance):
@@ -645,8 +654,11 @@ class SkyTime():
                 self.handHitBox = [hourHitBox, minuteHitBox]
 
                 # Draw the number hit box
-                self.windowSurfaceObj.blit(self.buttonHitBoxImage[0],
-                                           (width * .31, height * .2))
+                for i in range(0, len(self.numberHitBox)):
+                    self.windowSurfaceObj.blit(
+                        self.numberHitBox[i].image,
+                        (NUMBERS_HIT_BOX[i]['render_left'],
+                         NUMBERS_HIT_BOX[i]['render_top']))
 
                 # Draw the clock center
                 screen = transform.scale(
@@ -831,26 +843,24 @@ class SkyTime():
 
             # Check if the user is playing and if a number was clicked
             if self.playing:
-                for i in range(1, 2):
+                for i in range(0, 2):
                     buttonPressed = self.handHitBox[i].pressed(
                         self.mouseX, self.mouseY, self.curMouseState)
                     if buttonPressed:
-                        print("pressed")
-                        if self.numberHitBox[0].intersects(self.mouseX,
-                                                           self.mouseY):
-                            print("intersets")
-                            if i == 0:
-                                self.hour = self.numberHitBox[0].hour
-                                self.update_hands = True
-                                break
-                            else:
-                                self.minute = self.numberHitBox[0].minute
-                                self.update_hands = True
-                                break
-                        else:
-                            print("no intersets")
-                    else:
-                        print("no press")
+                        handSet = False
+                        for x in range(0, len(self.numberHitBox)):
+                            if self.numberHitBox[x].intersects(self.mouseX,
+                                                               self.mouseY):
+                                if i == 0:
+                                    self.hour = self.numberHitBox[x].hour
+                                    self.update_hands = True
+                                    handSet = True
+                                else:
+                                    self.minute = self.numberHitBox[x].minute
+                                    self.update_hands = True
+                                    handSet = True
+                        if handSet:
+                            break
                 #for i in range(0, 12):
                 #    if self.buttons[i].click(
                 #            self.mouseX, self.mouseY, self.curMouseState):

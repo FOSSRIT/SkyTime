@@ -6,7 +6,7 @@ class Button:
         self.hour = hour
         self.width = width
         self.height = height
-        self.images = []
+        self.image = None
         self.prevPressed = False
 
     def pressed(self, x, y, curState):
